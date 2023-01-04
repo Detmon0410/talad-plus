@@ -4,6 +4,8 @@ const bcrypt = require("bcrypt");
 const passport = require("passport");
 
 const User = db.user;
+
+//api login
 exports.login = async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -20,15 +22,26 @@ exports.login = async (req, res) => {
           .send({ message: "Username or Password is incorrect or not found" });
       }
     });
-    res.status(200).send({ message: "welcome " + user.name });
+    if (user.role == "01") {
+      res
+        .status(200)
+        .send({ message: "welcome " + user.name + " as merchant" });
+    }
+    if (user.role == "00") {
+      res
+        .status(200)
+        .send({ message: "welcome " + user.name + " as merchant" });
+    }
   } catch (err) {}
 };
+
+//api register
 exports.register = async (req, res) => {
   try {
-    const { username, password, name } = req.body;
+    const { username, password, name, role } = req.body;
 
     // simple validation
-    if (!name || !username || !password) {
+    if (!name || !username || !password || !role) {
       return res.status(403).send({ message: "Please try again" });
     }
 
@@ -37,6 +50,7 @@ exports.register = async (req, res) => {
       name,
       username,
       password: passwordHash,
+      role,
     });
 
     await user.save();

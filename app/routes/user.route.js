@@ -1,6 +1,7 @@
 module.exports = function (app) {
   var router = require("express").Router();
   const userController = require("../controllers/user.controller");
+  const marketController = require("../controllers/market.controller");
 
   app.use(function (req, res, next) {
     res.header(
@@ -12,6 +13,7 @@ module.exports = function (app) {
 
   router.post("/register", userController.register);
   router.post("/login", userController.login);
+  router.post("/marketregister", marketController.marketregister);
 
   app.use("/apis/user", router);
 };
