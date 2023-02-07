@@ -14,10 +14,10 @@ export default function BasicTextFields() {
     >
       {" "}
       <p>
-        <TextField id="filled-basic" label="Username" variant="filled" />
+        <TextField id="username" label="Username" variant="filled" />
       </p>
       <p>
-        <TextField id="filled-basic" label="Password" variant="filled" />
+        <TextField id="password" label="Password" variant="filled" />
       </p>
     </Box>
   );

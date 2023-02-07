@@ -16,12 +16,27 @@
 .App-header {
   background-color: #ffffff;
   min-height: 100vh;
+  
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
+  color: rgb(255, 255, 255);
+  
+}
+
+.App-header-page {
+  background-color: #ffffff;
+  
+  
+  display: flex;
+  flex-direction: column;
+  align-items: right;
+  
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: rgb(0, 0, 0);
   
 }
 .Picture{
@@ -29,34 +44,25 @@
   height: 420px;
 
 }
-
-.Text-Style{
-  background-color: #ffffff;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-
-}
 .App-link {
   font-size: calc(1px + 2vmin);
-  color: #61dafb;
+  color: hsl(46, 100%, 55%);
 }
 .Button-S{
   font-size: calc(1px + 2vmin);
-  color: #61dafb;
+  color: #ffc422;
 
 }
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+
+.Text-Style{
+  
+  
+  
+  font-size: calc(30px + 2vmin);
+  color: rgb(0, 0, 0);
+
 }
+
+
 
 
