@@ -67,7 +67,7 @@ exports.register = async (req, res) => {
 exports.register = async (req, res) => {
   try {
     const { username, password, name, email, role } = req.body;
-
+    console.log(req.body);
     // simple validation
     if (!name || !username || !password || !email) {
       return res.status(403).send({ message: "Please try again" });

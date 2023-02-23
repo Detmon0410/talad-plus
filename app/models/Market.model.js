@@ -3,6 +3,13 @@ const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
   name: String,
+  closedDate: [String],
+  zone: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Stall Zone",
+    },
+  ],
   address: String,
   district: String,
   province: String,
