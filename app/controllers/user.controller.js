@@ -38,19 +38,20 @@ exports.login = async (req, res) => {
 //api register
 exports.register = async (req, res) => {
   try {
-    const { username, password, name, role } = req.body;
+    const { username, password, name, email, role } = req.body;
 
     // simple validation
-    if (!name || !username || !password || !role) {
+    if (!name || !username || !password || !email) {
       return res.status(403).send({ message: "Please try again" });
     }
 
     const passwordHash = bcrypt.hashSync(password, 10);
     const user = new User({
-      name,
-      username,
+      name: name,
+      username: username,
       password: passwordHash,
-      role,
+      role: role,
+      email: email,
     });
 
     await user.save();
