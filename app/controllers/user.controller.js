@@ -63,3 +63,31 @@ exports.register = async (req, res) => {
     }
   }
 };
+
+exports.register = async (req, res) => {
+  try {
+    const { username, password, name, email, role } = req.body;
+
+    // simple validation
+    if (!name || !username || !password || !email) {
+      return res.status(403).send({ message: "Please try again" });
+    }
+
+    const passwordHash = bcrypt.hashSync(password, 10);
+    const user = new User({
+      name: name,
+      username: username,
+      password: passwordHash,
+      role: role,
+      email: email,
+    });
+
+    await user.save();
+    return res.status(201).send({ message: "Register successfully" });
+  } catch (err) {
+    console.log(err);
+    if (err.code == 11000) {
+      return res.status(403).send({ message: "Duplicate username" });
+    }
+  }
+};

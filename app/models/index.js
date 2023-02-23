@@ -7,5 +7,7 @@ db.mongoose = mongoose;
 
 db.user = require("./User.model");
 db.market = require("./Market.model");
+db.stall = require("./Stall.model");
+db.renter = require("./Renter.model");
 
 module.exports = db;

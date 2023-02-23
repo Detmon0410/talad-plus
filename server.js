@@ -32,7 +32,9 @@ app.use(cookieParser());
 
 // routes
 // require("./app/routes/auth.routes")(app);
-require("./app/routes/user.route")(app);
+require("./app/routes/user.routes")(app);
+require("./app/routes/market.routes")(app);
+require("./app/routes/stall.routes")(app);
 
 // redirect all other route to frontend
 // app.get("*", function (req, res) {
@@ -45,6 +47,7 @@ server = app.listen(port, () => console.log("server running on port " + port));
 
 // connect to database
 db.mongoose
+  .set("strictQuery", true)
   .connect(process.env.DB)
   .then(() => {
     new db.mongoose.mongo.Admin(db.mongoose.connection.db).buildInfo(

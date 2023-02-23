@@ -2,9 +2,13 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
-  market_name: String,
-  market_detials: String,
-  market_address: String,
+  name: String,
+  address: String,
+  district: String,
+  province: String,
+  post: String,
+  img: String,
+  isDonate: { type: Boolean, default: false },
 });
 
 const UserModel = mongoose.model("Market", userSchema);
