@@ -1,6 +1,6 @@
 module.exports = function (app) {
   var router = require("express").Router();
-  const userController = require("../controllers/user.controller");
+  const authController = require("../controllers/auth.controller");
 
   app.use(function (req, res, next) {
     res.header(
@@ -10,8 +10,8 @@ module.exports = function (app) {
     next();
   });
 
-  router.post("/register", userController.register);
-  router.post("/login", userController.login);
+  router.post("/register", authController.register);
+  router.post("/login", authController.login);
 
-  app.use("/apis/user", router);
+  app.use("/apis/auth", router);
 };

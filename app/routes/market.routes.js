@@ -1,6 +1,7 @@
 module.exports = function (app) {
   var router = require("express").Router();
   const marketController = require("../controllers/market.controller");
+  const { authJwt } = require("../middlewares");
 
   app.use(function (req, res, next) {
     res.header(
@@ -13,11 +14,9 @@ module.exports = function (app) {
   router.get("/", marketController.getAllMarket);
   router.get("/donate", marketController.getMarketDonatePriority);
   router.get("/near", marketController.getMarketNearMe);
-  router.post("/register", marketController.register);
+  router.post("/register", authJwt.verifyToken, marketController.register);
   router.patch("/:id", marketController.editMarket);
   router.delete("/:id", marketController.deteleMarket);
-  router.post("/:id/stall", marketController.createStall);
-  router.get("/:id/stall", marketController.getStall);
   router.patch("/:id/setdonate", marketController.setDonate);
 
   app.use("/apis/market", router);

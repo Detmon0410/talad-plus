@@ -13,27 +13,23 @@ exports.register = async (req, res) => {
     const { name, phone, address, district, province, post, img } = req.body;
 
     // simple validation
-    if (
-      !name ||
-      !phone ||
-      !address ||
-      !district ||
-      !province ||
-      !post ||
-      !img
-    ) {
+    if ((name, !phone || !address || !district || !province || !post || !img)) {
       return res.status(403).send({ message: "Please try again" });
     }
-
+    const myMarket = await Market.findOne({ owner: req.user });
+    if (myMarket) {
+      return res.status(403).send({ message: "Duplicate Market" });
+    }
+    if (req.user.role != "owner") {
+      return res.status(403).send({ message: "you are not owner" });
+    }
     const market = new Market(req.body);
-
+    market.owner = req.user;
     await market.save();
     return res.status(201).send({ message: "Register successfully" });
   } catch (err) {
     console.log(err);
-    if (err.code == 11000) {
-      return res.status(403).send({ message: "Duplicate username" });
-    }
+    return res.status(403).send({ message: "Duplicate username" });
   }
 };
 
@@ -101,41 +97,6 @@ exports.deteleMarket = async (req, res) => {
   try {
     await Market.findByIdAndDelete(req.params.id);
     return res.status(200).send({ status: "market delete" });
-  } catch (err) {
-    console.log(err);
-    return res.status(500).send(err);
-  }
-};
-
-exports.createStall = async (req, res) => {
-  try {
-    const market = await Market.findById(req.params.id);
-    const { zone, startNum, endNum, price, about } = req.body;
-    if (!market) {
-      return res.status(404).send({ status: "market not found" });
-    }
-    const stall = new Stall({
-      market: market,
-      zone: zone,
-      startNum: startNum,
-      endNum: endNum,
-      price: price,
-      about: about,
-    });
-    await stall.save();
-    return res.status(200).send({ status: "Create Stall" });
-  } catch (err) {
-    console.log(err);
-    return res.status(500).send(err);
-  }
-};
-
-exports.getStall = async (req, res) => {
-  try {
-    const market = await Market.findById(req.params.id);
-    const stall = await Stall.find({ market: market });
-
-    return res.status(200).send(stall);
   } catch (err) {
     console.log(err);
     return res.status(500).send(err);

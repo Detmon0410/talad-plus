@@ -32,9 +32,9 @@ app.use(cookieParser());
 
 // routes
 // require("./app/routes/auth.routes")(app);
-require("./app/routes/user.routes")(app);
+require("./app/routes/auth.routes")(app);
 require("./app/routes/market.routes")(app);
-require("./app/routes/stall.routes")(app);
+require("./app/routes/management.routes")(app);
 
 // redirect all other route to frontend
 // app.get("*", function (req, res) {

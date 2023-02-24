@@ -8,11 +8,16 @@ const userSchema = new Schema({
   },
 
   number: Number,
-  dateStart: String,
-  dateEnd: String,
+  dateStart: Date,
+  dateEnd: Date,
   payment: String,
-  Status: { type: Boolean, default: false },
+  status: { type: String, default: "Waiting for payment" },
+  user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  market: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Market",
+  },
 });
 
-const UserModel = mongoose.model("Substall", userSchema);
+const UserModel = mongoose.model("SubStall", userSchema);
 module.exports = UserModel;
