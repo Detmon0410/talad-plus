@@ -13,7 +13,7 @@ exports.register = async (req, res) => {
     const { name, phone, address, district, province, post, img } = req.body;
 
     // simple validation
-    if ((name, !phone || !address || !district || !province || !post || !img)) {
+    if ((!name || !phone || !address || !district || !province || !post || !img)) {
       return res.status(403).send({ message: "Please try again" });
     }
     const myMarket = await Market.findOne({ owner: req.user });
@@ -89,7 +89,7 @@ exports.editMarket = async (req, res) => {
     return res.status(200).send({ status: "Market edited" });
   } catch (err) {
     console.log(err);
-    return res.status(500).send(err);
+    return res.status(500).send({status: "please try again"});
   }
 };
 

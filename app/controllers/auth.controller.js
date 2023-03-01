@@ -66,6 +66,7 @@ exports.register = async (req, res) => {
       password: passwordHash,
       role: role,
       email: email,
+      province: "",
     });
 
     await user.save();
