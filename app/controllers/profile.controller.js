@@ -11,7 +11,7 @@ const Profile = db.profile;
 exports.editProfile = async (req, res) => {
   try {
     const data = req.body;
-    const user = await User.findByIdAndUpdate(req.params.id, data, {
+    const user = await Profile.findByIdAndUpdate(req.params.id, data, {
       new: true,
     });
     await user.save();
@@ -24,8 +24,10 @@ exports.editProfile = async (req, res) => {
 
 exports.getMyProfile = async (req, res) => {
   try {
-    const myUser = await User.find({ user: req.user });
-    return res.status(200).send(myUser);
+    const user = await User.findById(req.params.user);
+    const profile = await Profile.find({ merchant: user }).select('-merchant -_id -__v');
+
+    return res.status(200).send(profile);
   } catch (err) {
     console.log(err);
     return res.status(500).send(err);
@@ -44,11 +46,13 @@ exports.createProfile = async (req, res) => {
       return res.status(403).send({ message: "you are not merchant" });
     }
 
-    const user = await User.findByIdAndUpdate(req.params.id, data, {
-      new: true,
-    });
-    
+    const user = await User.findById(req.params.register);
+    if (!user) {
+      return res.status(404).send({ status: "user not found" });
+    }
+
     const profile = new Profile({
+      merchant: user,
       name: name,
       province: province,
       district: district,

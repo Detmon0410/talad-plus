@@ -11,9 +11,9 @@ module.exports = function (app) {
       next();
     });
   
-    router.get("/", [authJwt.verifyToken],profileController.getMyProfile);
+    router.get("/:user", [authJwt.verifyToken],profileController.getMyProfile);
     router.patch("/:id/", [authJwt.verifyToken],profileController.editProfile);
-    router.get("/:register", [authJwt.verifyToken],profileController.createProfile);
+    router.post("/:register", [authJwt.verifyToken],profileController.createProfile);
   
     app.use("/apis/profile", router);
   };
