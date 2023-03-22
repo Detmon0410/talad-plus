@@ -20,7 +20,7 @@ exports.getMyMarket = async (req, res) => {
 exports.createStall = async (req, res) => {
   try {
     const market = await Market.findById(req.params.marketId);
-    const { zone, startNum, endNum, price, about } = req.body;
+    const { zone, startNum, endNum, price, about, dayOpen } = req.body;
     if (!market) {
       return res.status(404).send({ status: "market not found" });
     }
@@ -31,6 +31,7 @@ exports.createStall = async (req, res) => {
       endNum: endNum,
       price: price,
       about: about,
+      dayOpen: dayOpen,
     });
     await stall.save();
     return res.status(200).send({ status: "Create Stall" });

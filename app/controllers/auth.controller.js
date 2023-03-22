@@ -34,6 +34,7 @@ exports.login = async (req, res) => {
     });
     return res.status(200).send({
       name: user.name,
+      role: user.role,
     });
   } catch (err) {
     console.log(err);
@@ -68,7 +69,14 @@ exports.register = async (req, res) => {
       email: email,
       province: "",
     });
-
+    const token = jwt.sign({ id: user.id }, "config.secret", {
+      expiresIn: 360000,
+    });
+    res.cookie("token", token, {
+      maxAge: 36000000000000,
+      httpOnly: false,
+      secure: false,
+    });
     await user.save();
     return res.status(201).send({ message: "Register successfully" });
   } catch (err) {

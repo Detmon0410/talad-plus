@@ -10,17 +10,17 @@ const StallZone = db.stallZone;
 //api register
 exports.register = async (req, res) => {
   try {
-    const { name, phone, address, district, province, post, img } = req.body;
+    const { name, phone, address, district, province, post } = req.body;
 
     // simple validation
-    if ((!name || !phone || !address || !district || !province || !post || !img)) {
+    if (!name || !phone || !address || !district || !province || !post) {
       return res.status(403).send({ message: "Please try again" });
     }
     const myMarket = await Market.findOne({ owner: req.user });
     if (myMarket) {
       return res.status(403).send({ message: "Duplicate Market" });
     }
-    if (req.user.role != "owner") {
+    if (req.user.role != "Market") {
       return res.status(403).send({ message: "you are not owner" });
     }
     const market = new Market(req.body);
@@ -89,7 +89,7 @@ exports.editMarket = async (req, res) => {
     return res.status(200).send({ status: "Market edited" });
   } catch (err) {
     console.log(err);
-    return res.status(500).send({status: "please try again"});
+    return res.status(500).send({ status: "please try again" });
   }
 };
 

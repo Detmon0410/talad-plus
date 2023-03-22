@@ -12,6 +12,7 @@ const userSchema = new Schema({
   endNum: Number,
   price: Number,
   about: String,
+  dayOpen: [String],
 });
 
 const UserModel = mongoose.model("Stall", userSchema);
