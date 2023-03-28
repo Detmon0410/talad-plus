@@ -7,6 +7,8 @@ const jwt = require("jsonwebtoken");
 
 const User = db.user;
 const Profile = db.profile;
+const Report = db.report;
+const Substall = db.subStall;
 
 exports.editProfile = async (req, res) => {
   try {
@@ -15,7 +17,7 @@ exports.editProfile = async (req, res) => {
       new: true,
     });
     await user.save();
-    return res.status(200).send({ status: "Market edited" });
+    return res.status(200).send({ status: "Profile edited" });
   } catch (err) {
     console.log(err);
     return res.status(500).send({status:"Please try again"});
@@ -45,7 +47,6 @@ exports.createProfile = async (req, res) => {
     if (req.user.role != "merchant") {
       return res.status(403).send({ message: "you are not merchant" });
     }
-
     const user = await User.findById(req.params.register);
     if (!user) {
       return res.status(404).send({ status: "user not found" });
@@ -62,6 +63,36 @@ exports.createProfile = async (req, res) => {
 
     await profile.save();
     return res.status(201).send({ message: "Register successfully" });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send(err);
+  }
+};
+
+exports.reportProfile = async (req, res) => {
+  try {
+    const profile = await Profile.findById(req.params.user);
+    const { topic, description} = req.body;
+    const report = new Report({
+      profile: profile,
+      topic: topic,
+      description: description,
+    });
+    
+    await report.save();
+    return res.status(201).send({ message: "Report successfully" });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send(err);
+  }
+};
+
+exports.getSubstall = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.user);
+    const substall = await Substall.find({ merchant: user });
+
+    return res.status(200).send(substall);
   } catch (err) {
     console.log(err);
     return res.status(500).send(err);

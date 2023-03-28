@@ -11,5 +11,6 @@ db.stall = require("./Stall.model");
 db.renter = require("./Renter.model");
 db.subStall = require("./Substall.model");
 db.profile = require("./Profile.model");
+db.report = require("./Report.model")
 
 module.exports = db;

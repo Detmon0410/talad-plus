@@ -14,7 +14,9 @@ module.exports = function (app) {
     router.get("/:user", [authJwt.verifyToken],profileController.getMyProfile);
     router.patch("/:id/", [authJwt.verifyToken],profileController.editProfile);
     router.post("/:register", [authJwt.verifyToken],profileController.createProfile);
-  
+    router.post("/:user/report", [authJwt.verifyToken],profileController.reportProfile);
+    router.get("/:user/substall", [authJwt.verifyToken],profileController.getSubstall);
+
     app.use("/apis/profile", router);
   };
   

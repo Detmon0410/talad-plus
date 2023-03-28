@@ -5,7 +5,6 @@ const passport = require("passport");
 
 const Market = db.market;
 const Stall = db.stall;
-const StallZone = db.stallZone;
 
 //api register
 exports.register = async (req, res) => {
