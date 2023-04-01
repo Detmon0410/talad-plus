@@ -6,12 +6,14 @@ const passport = require("passport");
 const jwt = require("jsonwebtoken");
 
 const User = db.user;
+const Profile = db.profile;
 
 //api login
 exports.login = async (req, res) => {
   try {
     const { username, password } = req.body;
     const user = await User.findOne({ username: username });
+
     if (!user) {
       return res
         .status(404)
@@ -32,9 +34,11 @@ exports.login = async (req, res) => {
       httpOnly: false,
       secure: false,
     });
+    const myUser = await Profile.findOne({ merchant: user });
     return res.status(200).send({
       name: user.name,
       role: user.role,
+      img: myUser.img,
     });
   } catch (err) {
     console.log(err);

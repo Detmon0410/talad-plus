@@ -4,7 +4,7 @@ const cookieParser = require("cookie-parser");
 const express = require("express");
 const cors = require("cors");
 const db = require("./app/models");
-
+const fileUpload = require("express-fileupload");
 const app = express();
 
 //enable dotenv
@@ -29,6 +29,15 @@ app.use(bodyParser.json());
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+// enabled file upload
+app.use(
+  fileUpload({
+    limits: {
+      fileSize: 100000000, //100mb
+    },
+  })
+);
 
 // routes
 // require("./app/routes/auth.routes")(app);

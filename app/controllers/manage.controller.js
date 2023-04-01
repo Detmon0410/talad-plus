@@ -17,6 +17,18 @@ exports.getMyMarket = async (req, res) => {
   }
 };
 
+exports.getSelectedMarket = async (req, res) => {
+  try {
+    console.log(req.params.marketId);
+    const selectedmarket = await Market.findById(req.params.marketId);
+
+    return res.status(200).send(selectedmarket);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send(err);
+  }
+};
+
 exports.createStall = async (req, res) => {
   try {
     const market = await Market.findById(req.params.marketId);

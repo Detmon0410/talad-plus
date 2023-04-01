@@ -17,6 +17,7 @@ module.exports = function (app) {
   router.post("/register", authJwt.verifyToken, marketController.register);
   router.patch("/:id", marketController.editMarket);
   router.delete("/:id", marketController.deteleMarket);
+
   router.patch("/:id/setdonate", marketController.setDonate);
 
   app.use("/apis/market", router);
