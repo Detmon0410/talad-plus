@@ -10,6 +10,16 @@ const Stall = db.stall;
 exports.register = async (req, res) => {
   try {
     const { name, phone, address, district, province, post } = req.body;
+    let image_b64 = "";
+    let image_b64_license = "";
+
+    if (req.files) {
+      image_data = req.files.img;
+      image_b64 = image_data.data.toString("base64");
+
+      image_license_data = req.files.imglicense;
+      image_b64_license = image_license_data.data.toString("base64");
+    }
 
     // simple validation
     if (!name || !phone || !address || !district || !province || !post) {
@@ -23,7 +33,10 @@ exports.register = async (req, res) => {
       return res.status(403).send({ message: "you are not owner" });
     }
     const market = new Market(req.body);
+
     market.owner = req.user;
+    market.imglicense = image_b64_license;
+    market.img = image_b64;
     await market.save();
     return res.status(201).send({ message: "Register successfully" });
   } catch (err) {

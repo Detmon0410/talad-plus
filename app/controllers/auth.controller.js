@@ -34,6 +34,14 @@ exports.login = async (req, res) => {
       httpOnly: false,
       secure: false,
     });
+    if (user.role != "Merchant") {
+      const myUser = await Profile.findOne({ market: user });
+      return res.status(200).send({
+        name: user.name,
+        role: user.role,
+        img: myUser.img,
+      });
+    }
     const myUser = await Profile.findOne({ merchant: user });
     return res.status(200).send({
       name: user.name,

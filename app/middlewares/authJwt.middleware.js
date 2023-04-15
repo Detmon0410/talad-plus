@@ -8,7 +8,6 @@ const User = db.user;
 verifyToken = async (req, res, next) => {
   try {
     const token = req.cookies.token;
-    console.log(token);
     if (!token) {
       return res.status(403).send({ message: "No token provided!" });
     }

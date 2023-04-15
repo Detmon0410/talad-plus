@@ -13,6 +13,8 @@ const userSchema = new Schema({
   price: Number,
   about: String,
   dayOpen: [String],
+  paytype: String,
+  img: String,
 });
 
 const UserModel = mongoose.model("Stall", userSchema);

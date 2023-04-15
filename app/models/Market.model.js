@@ -19,6 +19,7 @@ const userSchema = new Schema({
   province: String,
   post: String,
   img: String,
+  imglicense: String,
   isDonate: { type: Boolean, default: false },
 });
 

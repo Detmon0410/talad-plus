@@ -31,11 +31,22 @@ exports.getSelectedMarket = async (req, res) => {
 
 exports.createStall = async (req, res) => {
   try {
-    const market = await Market.findById(req.params.marketId);
-    const { zone, startNum, endNum, price, about, dayOpen } = req.body;
+    const market = await Market.findById(req.params.marketId); //เรียกจาก path maret/maret:id/
+    let image_b64 = "";
+    if (req.files) {
+      image_data = req.files.img;
+      console.log(req.files.img);
+      image_b64 = image_data.data.toString("base64");
+    }
+    const { zone, startNum, endNum, price, about, dayOpen, mtype } = req.body;
     if (!market) {
       return res.status(404).send({ status: "market not found" });
     }
+    const existingStall = await Stall.findOne({ zone, startNum, endNum });
+    if (existingStall) {
+      return res.status(409).send({ status: "Stall already exists" });
+    }
+
     const stall = new Stall({
       market: market,
       zone: zone,
@@ -44,6 +55,8 @@ exports.createStall = async (req, res) => {
       price: price,
       about: about,
       dayOpen: dayOpen,
+      paytype: mtype,
+      img: image_b64,
     });
     await stall.save();
     return res.status(200).send({ status: "Create Stall" });
@@ -53,12 +66,46 @@ exports.createStall = async (req, res) => {
   }
 };
 
-exports.getStall = async (req, res) => {
+exports.getStallAll = async (req, res) => {
   try {
-    const market = await Market.findById(req.params.marketId);
-    const stall = await Stall.find({ market: market });
+    console.log(req.params.marketId);
+    const market = await Market.findById(req.params.marketId).select([
+      "name",
+      "img",
+    ]); //findById หาจากที่ตรงกับเงื่อนไขทั้งหมดที่ตรงกับ ID ที่ใส่ไป
+    const stall = await Stall.find({ market: market }); //Find หา data ทั้งหมดที่ตรงกับเงื่อนไข // findOne เอาแค่ตัวแรกที่ตรงกับเงื่อนไข
+    const marketstall = { stall: stall, market: market };
+    return res.status(200).send(marketstall);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send(err);
+  }
+};
 
-    return res.status(200).send(stall);
+exports.getSubStall = async (req, res) => {
+  try {
+    const dateStart = new Date(req.query.date); //เรียกจาก payload
+    let dateEnd = new Date(dateStart);
+    const zone = req.params.stallId;
+    const selectZone = await Stall.findById(zone); //findById หาจากที่ตรงกับเงื่อนไขทั้งหมดที่ตรงกับ ID ที่ใส่ไป
+    //Find หา data ทั้งหมดที่ตรงกับเงื่อนไข // findOne เอาแค่ตัวแรกที่ตรงกับเงื่อนไข
+    if (selectZone.paytype === "Month") {
+      dateEnd.setDate(dateEnd.getDate() + 30);
+    } else {
+      dateEnd.setDate(dateEnd.getDate() + 1);
+    }
+    const substall = await SubStall.find({
+      stall: selectZone,
+      $and: [
+        { dateStart: { $lte: dateEnd } },
+        { dateEnd: { $gte: dateStart } },
+      ],
+    }).populate({
+      path: "stall",
+      select: "zone",
+    });
+    // const stallres = { stall: selectZone, substall: substall };
+    return res.status(200).send(substall);
   } catch (err) {
     console.log(err);
     return res.status(500).send(err);
@@ -67,50 +114,31 @@ exports.getStall = async (req, res) => {
 
 exports.rentStall = async (req, res) => {
   try {
-    let { number, dateStart, dateEnd, payment } = req.body;
-    dateStart = new Date(dateStart);
-    dateEnd = new Date(dateEnd);
+    const dateStart = new Date(req.body.date); //เรียกจาก payload
+    let dateEnd = new Date(dateStart);
+    let { number, payment } = req.body;
+
     const market = await Market.findById(req.params.marketId);
-    const stall = await Stall.findById(req.params.stallId);
-    if (!stall.market.equals(market._id)) {
+    const selectZone = await Stall.findById(req.params.stallId);
+    if (selectZone.paytype === "Month") {
+      dateEnd.setDate(dateEnd.getDate() + 30);
+    } else {
+      dateEnd.setDate(dateEnd.getDate() + 1);
+    }
+
+    if (!selectZone.market.equals(market._id)) {
       return res.status(403).send({ message: "Stall doesn't match market" });
     }
     if (req.user.role !== "user") {
       return res.status(403).send({ message: "Market owner can't rent stall" });
     }
-    if (!(number >= stall.startNum && number <= stall.endNum)) {
-      return res.status(403).send({ message: "stall number out of range" });
+    if (!(number >= selectZone.startNum && number <= selectZone.endNum)) {
+      return res.status(403).send({ messenage: "stall number out of range" });
     }
-    console.log(stall);
-    const isDuplicate = await SubStall.findOne({
-      user: req.user,
-      $or: [
-        { dateStart: { $lte: dateEnd }, dateEnd: { $gte: dateStart } },
-        { dateStart: { $gte: dateStart, $lte: dateEnd } },
-        { dateEnd: { $gte: dateStart, $lte: dateEnd } },
-      ],
-    });
-    if (isDuplicate) {
-      console.log(isDuplicate);
-      return res
-        .status(403)
-        .send({ message: "You have rented stall at selected time" });
-    }
-    const isRented = await SubStall.findOne({
-      number: number,
-      $or: [
-        { dateStart: { $lte: dateEnd }, dateEnd: { $gte: dateStart } },
-        { dateStart: { $gte: dateStart, $lte: dateEnd } },
-        { dateEnd: { $gte: dateStart, $lte: dateEnd } },
-      ],
-    });
-    if (isRented) {
-      console.log(isRented);
-      return res.status(403).send({ message: "This stall is rented" });
-    }
+
     const rentStall = new SubStall({
       market: market,
-      stall: stall,
+      stall: selectZone,
       user: req.user,
       number: number,
       dateStart: dateStart,
@@ -118,7 +146,7 @@ exports.rentStall = async (req, res) => {
       payment: payment,
     });
     await rentStall.save();
-    return res.status(200).send(rentStall);
+    return res.status(200).send({ status: "Rent Stall successful" });
   } catch (err) {
     console.log(err);
     return res.status(500).send(err);
