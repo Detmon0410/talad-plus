@@ -13,7 +13,7 @@ const userSchema = new Schema({
   aboutme: String,
   img: String,
   rating: Number,
-  phone: String
+  phone: String,
 });
 
 const UserModel = mongoose.model("Profile", userSchema);

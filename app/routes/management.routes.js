@@ -12,16 +12,19 @@ module.exports = function (app) {
   });
 
   router.get("/market", [authJwt.verifyToken], manageController.getMyMarket);
+
   router.post(
     "/market/:marketId/stall",
     [authJwt.verifyToken],
     manageController.createStall
   );
+
   router.get(
-    "/market/:marketId/stall",
+    "/market/:marketId/getstall",
     [authJwt.verifyToken],
-    manageController.getStall
+    manageController.getStallAll
   );
+
   router.post(
     "/market/:marketId/stall/:stallId/rent",
     [authJwt.verifyToken],
@@ -33,6 +36,17 @@ module.exports = function (app) {
     manageController.rentedStallList
   );
 
+  router.get(
+    "/market/:marketId/stall/:stallId/getsubstall",
+    [authJwt.verifyToken],
+    manageController.getSubStall
+  );
+
+  router.get(
+    "/mprofile/:marketId",
+    [authJwt.verifyToken],
+    manageController.getSelectedMarket
+  );
   router.get(
     "/user/stall/all",
     [authJwt.verifyToken],
