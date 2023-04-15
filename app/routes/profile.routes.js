@@ -18,6 +18,7 @@ module.exports = function (app) {
     router.get("/:user/substall", [authJwt.verifyToken],profileController.getSubstall);
     router.get("/:user/getreport", [authJwt.verifyToken],profileController.getReport);
     router.post("/registerm",[authJwt.verifyToken],profileController.merchantregister);
+    router.post("/registerm",[authJwt.verifyToken],profileController.merchantregister);
 
   app.use("/apis/profile", router);
 };
