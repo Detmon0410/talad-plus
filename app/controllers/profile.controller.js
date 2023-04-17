@@ -8,6 +8,8 @@ const { profile } = require("../models");
 
 const User = db.user;
 const Profile = db.profile;
+const Report = db.report;
+const Substall = db.subStall
 
 exports.editProfile = async (req, res) => {
   try {
@@ -124,7 +126,7 @@ exports.merchantregister = async (req, res) => {
 exports.getSubstall = async (req, res) => {
   try {
     const user = await User.findById(req.params.user);
-    const substall = await Substall.find({ merchant: user });
+    const substall = await Substall.find({ user: user });
 
     return res.status(200).send(substall);
   } catch (err) {

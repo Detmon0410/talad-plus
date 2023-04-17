@@ -9,6 +9,7 @@ const Stall = db.stall;
 const Substall = db.subStall;
 const Market = db.market;
 const Wallet = db.wallet;
+const Withdraw = db.withdraw
 
 exports.createWallet = async (req, res) => {
     try {
@@ -46,6 +47,27 @@ exports.Withdraw = async (req, res) => {
       const user = await User.findById(req.params.user);
       const money = await Wallet.findOne({ owner: user });
       const currentmoney = money.money
+      const now = new Date();
+      const timezoneOffsetInMs = now.getTimezoneOffset() * 60 * 1000;
+      const utcPlusSevenTimeInMs = now.getTime() + (7 * 60 * 60 * 1000) + timezoneOffsetInMs;
+      const utcPlusSevenTime = new Date(utcPlusSevenTimeInMs);
+      const hours = utcPlusSevenTime.getHours();
+      const minutes = utcPlusSevenTime.getMinutes();
+      const seconds = utcPlusSevenTime.getSeconds();
+      const date = utcPlusSevenTime.getUTCDate();
+      const month = utcPlusSevenTime.getUTCMonth() + 1; 
+      const year = utcPlusSevenTime.getUTCFullYear();
+
+      const withdraw = new Withdraw({
+        name: money.name,
+        bank_number: money.bank_number,
+        money: currentmoney,
+        date: `${date}/${month}/${year}`,
+        time: `${hours}:${minutes}:${seconds}`,
+        owner: user,
+      });
+      await withdraw.save();
+
       const wallet = await Wallet.updateOne({ owner: user }, {$set: { money: 0 } });
       
       return res.status(200).send("Withdraw "+currentmoney+" Bath");
@@ -53,6 +75,19 @@ exports.Withdraw = async (req, res) => {
       console.log(err);
       return res.status(500).send(err);
     }
-  };
+};
+
+exports.getMyWithdraw = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.user);
+    const wallet = await Withdraw.find({ owner: user }).select('-_id');
+
+    return res.status(200).send(wallet);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send(err);
+  }
+};
+
 
 
