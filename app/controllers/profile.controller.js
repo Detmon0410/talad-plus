@@ -37,7 +37,7 @@ exports.getMyProfile = async (req, res) => {
 
 exports.createProfile = async (req, res) => {
   try {
-    const { name, province, district, address, phone } = req.body;
+    const { name, province, district, address, phone, subdistrict } = req.body;
 
     // simple validation
     if (!name || !province || !district || !address || !phone) {
@@ -57,6 +57,7 @@ exports.createProfile = async (req, res) => {
       district: district,
       address: address,
       phone: phone,
+      subdistrict: subdistrict,
     });
 
     await profile.save();

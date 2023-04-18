@@ -8,12 +8,13 @@ const userSchema = new Schema({
   },
   name: String,
   address: String,
+  subdistrict: String,
   district: String,
   province: String,
   aboutme: String,
   img: String,
   rating: Number,
-  phone: String
+  phone: String,
 });
 
 const UserModel = mongoose.model("Profile", userSchema);

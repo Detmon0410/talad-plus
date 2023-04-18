@@ -9,7 +9,8 @@ const Stall = db.stall;
 //api register
 exports.register = async (req, res) => {
   try {
-    const { name, phone, address, district, province, post } = req.body;
+    const { name, phone, address, district, province, post, subdistrict } =
+      req.body;
     let image_b64 = "";
     let image_b64_license = "";
 
@@ -22,7 +23,15 @@ exports.register = async (req, res) => {
     }
 
     // simple validation
-    if (!name || !phone || !address || !district || !province || !post) {
+    if (
+      !name ||
+      !phone ||
+      !address ||
+      !district ||
+      !province ||
+      !post ||
+      !subdistrict
+    ) {
       return res.status(403).send({ message: "Please try again" });
     }
     const myMarket = await Market.findOne({ owner: req.user });

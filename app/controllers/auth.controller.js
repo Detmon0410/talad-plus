@@ -7,6 +7,7 @@ const jwt = require("jsonwebtoken");
 
 const User = db.user;
 const Profile = db.profile;
+const Market = db.market;
 
 //api login
 exports.login = async (req, res) => {
@@ -36,10 +37,12 @@ exports.login = async (req, res) => {
     });
     if (user.role != "Merchant") {
       const myUser = await Profile.findOne({ market: user });
+      const myMarket = await Market.findOne({ owner: user });
       return res.status(200).send({
         name: user.name,
         role: user.role,
         img: myUser.img,
+        uid: myMarket._id,
       });
     }
     const myUser = await Profile.findOne({ merchant: user });
@@ -47,6 +50,7 @@ exports.login = async (req, res) => {
       name: user.name,
       role: user.role,
       img: myUser.img,
+      uid: myUser._id,
     });
   } catch (err) {
     console.log(err);
