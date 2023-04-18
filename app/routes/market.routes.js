@@ -19,6 +19,8 @@ module.exports = function (app) {
   router.delete("/:id", marketController.deteleMarket);
 
   router.patch("/:id/setdonate", marketController.setDonate);
+  router.post("/:id/:review", marketController.ReviewMarket);
+  router.get("/:id/getreview", marketController.getReview);
 
   app.use("/apis/market", router);
 };

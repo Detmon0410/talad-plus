@@ -45,6 +45,8 @@ require("./app/routes/auth.routes")(app);
 require("./app/routes/market.routes")(app);
 require("./app/routes/management.routes")(app);
 require("./app/routes/profile.routes")(app);
+require("./app/routes/payment.routes")(app);
+require("./app/routes/wallet.routes")(app);
 
 // redirect all other route to frontend
 // app.get("*", function (req, res) {

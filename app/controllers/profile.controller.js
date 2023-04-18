@@ -8,6 +8,8 @@ const { profile } = require("../models");
 
 const User = db.user;
 const Profile = db.profile;
+const Report = db.report;
+const Substall = db.subStall
 
 exports.editProfile = async (req, res) => {
   try {
@@ -68,6 +70,26 @@ exports.createProfile = async (req, res) => {
   }
 };
 
+exports.reportProfile = async (req, res) => {
+  try {
+    const profile = await Profile.findById(req.params.user);
+    const reporter = await User.findById(req.params.report);
+    const { topic, description} = req.body;
+    const report = new Report({
+      reporter: reporter,
+      profile: profile,
+      topic: topic,
+      description: description,
+    });
+    
+    await report.save();
+    return res.status(201).send({ message: "Report successfully" });
+  } catch (err) {
+    console.log(err);
+    return res.status(403).send({ message: "Duplicate username" });
+  }
+};
+
 exports.merchantregister = async (req, res) => {
   try {
     const { name, phone, address, district, province, post } = req.body;
@@ -99,5 +121,27 @@ exports.merchantregister = async (req, res) => {
   } catch (err) {
     console.log(err);
     return res.status(403).send({ message: "Duplicate username" });
+  }
+};
+
+exports.getSubstall = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.user);
+    const substall = await Substall.find({ user: user });
+
+    return res.status(200).send(substall);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send(err);
+  }
+};
+
+exports.getReport = async (req, res) => {
+  try {
+    const report = await Report.find({ profile: req.params.user });
+    return res.status(200).send(report);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send(err);
   }
 };

@@ -5,6 +5,9 @@ const passport = require("passport");
 
 const Market = db.market;
 const Stall = db.stall;
+const User = db.user;
+const Profile = db.profile;
+const Review = db.review;
 
 //api register
 exports.register = async (req, res) => {
@@ -87,6 +90,17 @@ exports.getMarketNearMe = async (req, res) => {
   }
 };
 
+exports.getMarketNearMe = async (req, res) => {
+  try {
+    const { name, district, provice } = req.body;
+
+    
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send(err);
+  }
+};
+
 exports.setDonate = async (req, res) => {
   try {
     const market = await Market.findById(req.params.id);
@@ -118,6 +132,38 @@ exports.deteleMarket = async (req, res) => {
   try {
     await Market.findByIdAndDelete(req.params.id);
     return res.status(200).send({ status: "market delete" });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send(err);
+  }
+};
+
+exports.ReviewMarket = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.review);
+    const profile = await Profile.find({ merchant: user });
+    const stall = await Market.findById(req.params.id);
+    const { topic, description, star} = req.body;
+    const review = new Review({
+      profile: profile._id,
+      stall: stall,
+      topic: topic,
+      description: description,
+      star: star
+    });
+    
+    await review.save();
+    return res.status(201).send({ message: "Review successfully" });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send(err);
+  }
+};
+
+exports.getReview = async (req,    res) => {
+  try {
+    const review = await Review.find({ stall: req.params.id });
+    return res.status(200).send(review);
   } catch (err) {
     console.log(err);
     return res.status(500).send(err);
