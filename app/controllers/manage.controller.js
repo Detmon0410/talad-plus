@@ -140,6 +140,7 @@ exports.rentStall = async (req, res) => {
       market: market,
       stall: selectZone,
       user: req.user,
+      merchant: req.user.name,
       number: number,
       dateStart: dateStart,
       dateEnd: dateEnd,
@@ -192,15 +193,18 @@ exports.rentedStatusChange = async (req, res) => {
 
 exports.rentedMultipleStatusChange = async (req, res) => {
   try {
-    const subStallArray = req.body.subStallArrayId;
-    const status = req.body.status;
+    const subStallArray = req.body;
+
     for (let i = 0; i < subStallArray.length; i++) {
-      const subStall = await SubStall.findById(subStallArray[i]);
-      const market = await Market.findById(subStall.market);
-      if (!market.owner.equals(req.user._id)) {
-        return res.status(403).send({ message: "You are not market owner" });
-      }
-      subStall.status = status;
+      let substallId = subStallArray[i].id;
+      const subStall = await SubStall.findById(substallId);
+      console.log(subStall);
+      //   const market = await Market.findById(subStall.market);
+      //   if (!market.owner.equals(req.user._id)) {
+      //     return res.status(403).send({ message: "You are not market owner" });
+      //   }
+
+      subStall.status = "success";
       await subStall.save();
     }
     return res.status(200).send({ message: "Status change successfully" });

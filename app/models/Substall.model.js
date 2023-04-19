@@ -13,6 +13,7 @@ const userSchema = new Schema({
   payment: String,
   status: { type: String, default: "Waiting for payment" },
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  merchant: String,
   market: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Market",

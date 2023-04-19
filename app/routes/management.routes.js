@@ -35,11 +35,16 @@ module.exports = function (app) {
     [authJwt.verifyToken],
     manageController.rentedStallList
   );
-
   router.get(
     "/market/:marketId/stall/:stallId/getsubstall",
     [authJwt.verifyToken],
     manageController.getSubStall
+  );
+
+  router.post(
+    "/market/:marketId/stall/changestatus",
+    [authJwt.verifyToken],
+    manageController.rentedMultipleStatusChange
   );
 
   router.get(
