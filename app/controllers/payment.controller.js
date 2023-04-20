@@ -83,8 +83,8 @@ exports.addMoney = async (req, res) => {
       { new: true, upsert: true } // add the upsert option to create a new document if it doesn't exist
     );
     
-    substall.status = 'paid';
-    
+    substall.status = 'success';
+
     await substall.save();
     await wallet.save();
     return res.status(200).send({ status: "Wallet Incease" });
