@@ -272,3 +272,18 @@ exports.userRentedStallList = async (req, res) => {
     return res.status(500).send(err);
   }
 };
+
+exports.deteleSubStall = async (req, res) => {
+  try {
+    const substall = await SubStall.findById(req.params.id);
+    const substall_status = substall.status;
+    if(substall_status == 'success'){
+      return res.status(200).send({status: 'Success payment can not cancel'})
+    }
+    await SubStall.findByIdAndDelete(req.params.id);
+    return res.status(200).send({ status: "Stall canceled" });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send(err);
+  }
+};

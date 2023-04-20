@@ -58,5 +58,7 @@ module.exports = function (app) {
     manageController.userRentedStallList
   );
 
+  router.delete("/:id/stalldelete", [authJwt.verifyToken],manageController.deteleSubStall);
+
   app.use("/apis/manage", router);
 };
