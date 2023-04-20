@@ -9,7 +9,9 @@ const { profile } = require("../models");
 const User = db.user;
 const Profile = db.profile;
 const Report = db.report;
-const Substall = db.subStall
+const Substall = db.subStall;
+const Market = db.market;
+const Stall = db.stall;
 
 exports.editProfile = async (req, res) => {
   try {
@@ -128,13 +130,28 @@ exports.getSubstall = async (req, res) => {
   try {
     const user = await User.findById(req.params.user);
     const substall = await Substall.find({ user: user });
+    const marketIds = substall.map((item) => item.market);
+    const market = await Market.find({ _id: { $in: marketIds } });
+    const market_name = market.map((item) => item.name);
 
-    return res.status(200).send(substall);
+    const stallIds = substall.map((item) => item.stall);
+    const stall = await Stall.find({ _id: { $in: stallIds } });
+    const stall_zone = stall.map((item) => item.zone);
+    const stall_price = stall.map((item) => item.price);
+    
+    const info = {
+      market: market_name,
+      zone: stall_zone,
+      price: stall_price
+    };
+
+    return res.status(200).send({substall, info});
   } catch (err) {
     console.log(err);
     return res.status(500).send(err);
   }
 };
+
 
 exports.getReport = async (req, res) => {
   try {
