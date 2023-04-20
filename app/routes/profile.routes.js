@@ -24,15 +24,11 @@ module.exports = function (app) {
     profileController.reportProfile
   );
   router.get(
-    "/:user/substall",
+    "/user/substall",
     [authJwt.verifyToken],
     profileController.getSubstall
   );
-  router.get(
-    "/:user/getreport",
-    [authJwt.verifyToken],
-    profileController.getReport
-  );
+  router.get("/getreport", [authJwt.verifyToken], profileController.getReport);
   router.post(
     "/registerm",
     [authJwt.verifyToken],

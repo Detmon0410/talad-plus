@@ -76,14 +76,14 @@ exports.reportProfile = async (req, res) => {
   try {
     const profile = await Profile.findById(req.params.user);
     const reporter = await User.findById(req.params.report);
-    const { topic, description} = req.body;
+    const { topic, description } = req.body;
     const report = new Report({
       reporter: reporter,
       profile: profile,
       topic: topic,
       description: description,
     });
-    
+
     await report.save();
     return res.status(201).send({ message: "Report successfully" });
   } catch (err) {
@@ -128,30 +128,14 @@ exports.merchantregister = async (req, res) => {
 
 exports.getSubstall = async (req, res) => {
   try {
-    const user = await User.findById(req.params.user);
+    const user = await User.findById(req.user);
     const substall = await Substall.find({ user: user });
-    const marketIds = substall.map((item) => item.market);
-    const market = await Market.find({ _id: { $in: marketIds } });
-    const market_name = market.map((item) => item.name);
-
-    const stallIds = substall.map((item) => item.stall);
-    const stall = await Stall.find({ _id: { $in: stallIds } });
-    const stall_zone = stall.map((item) => item.zone);
-    const stall_price = stall.map((item) => item.price);
-    
-    const info = {
-      market: market_name,
-      zone: stall_zone,
-      price: stall_price
-    };
-
-    return res.status(200).send({substall, info});
+    return res.status(200).send(substall);
   } catch (err) {
     console.log(err);
     return res.status(500).send(err);
   }
 };
-
 
 exports.getReport = async (req, res) => {
   try {

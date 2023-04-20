@@ -93,8 +93,6 @@ exports.getMarketNearMe = async (req, res) => {
 exports.getMarketNearMe = async (req, res) => {
   try {
     const { name, district, provice } = req.body;
-
-    
   } catch (err) {
     console.log(err);
     return res.status(500).send(err);
@@ -143,15 +141,15 @@ exports.ReviewMarket = async (req, res) => {
     const user = await User.findById(req.params.review);
     const profile = await Profile.find({ merchant: user });
     const stall = await Market.findById(req.params.id);
-    const { topic, description, star} = req.body;
+    const { topic, description, star } = req.body;
     const review = new Review({
       profile: profile._id,
       stall: stall,
       topic: topic,
       description: description,
-      star: star
+      star: star,
     });
-    
+
     await review.save();
     return res.status(201).send({ message: "Review successfully" });
   } catch (err) {
@@ -160,9 +158,9 @@ exports.ReviewMarket = async (req, res) => {
   }
 };
 
-exports.getReview = async (req,    res) => {
+exports.getReview = async (req, res) => {
   try {
-    const review = await Review.find({ stall: req.params.id });
+    const review = await Review.find({ market: req.params.marketId });
     return res.status(200).send(review);
   } catch (err) {
     console.log(err);

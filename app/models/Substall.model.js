@@ -8,6 +8,8 @@ const userSchema = new Schema({
   },
 
   number: Number,
+  rentedzone: String,
+  price: String,
   dateStart: Date,
   dateEnd: Date,
   payment: String,
