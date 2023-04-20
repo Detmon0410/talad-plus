@@ -20,6 +20,11 @@ const userSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Market",
   },
+  market_name: String,
+  zone: String,
+  transfer_date: String,
+  transfer_time: String,
+  price: Number,
 });
 
 const UserModel = mongoose.model("SubStall", userSchema);

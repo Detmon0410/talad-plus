@@ -74,11 +74,17 @@ exports.addMoney = async (req, res) => {
     const substall = await Substall.findById(req.params.payment);
     const stall = await Stall.findById(substall.stall);
     const price = stall.price;
-    console.log(substall.user);
+    const market = await Market.findById(stall.market);
+    console.log('market:', market);
+
+    // Find or create the wallet document for the market owner
     const wallet = await Wallet.findOneAndUpdate(
-      { owner: substall.user },
-      { $inc: { money: stall.price } }
+      { owner: market.owner },
+      { $inc: { money: stall.price } },
+      { new: true, upsert: true } // add the upsert option to create a new document if it doesn't exist
     );
+
+    console.log('wallet:', wallet);
     await wallet.save();
     return res.status(200).send({ status: "Wallet Incease" });
   } catch (err) {

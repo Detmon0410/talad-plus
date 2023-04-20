@@ -120,6 +120,26 @@ exports.rentStall = async (req, res) => {
 
     const market = await Market.findById(req.params.marketId);
     const selectZone = await Stall.findById(req.params.stallId);
+
+    const now = new Date();
+    const timezoneOffsetInMs = now.getTimezoneOffset() * 60 * 1000;
+    const utcPlusSevenTimeInMs =
+      now.getTime() + 7 * 60 * 60 * 1000 + timezoneOffsetInMs;
+    const utcPlusSevenTime = new Date(utcPlusSevenTimeInMs);
+    const hours = utcPlusSevenTime.getHours();
+    const minutes = utcPlusSevenTime.getMinutes();
+    const seconds = utcPlusSevenTime.getSeconds();
+    const date = utcPlusSevenTime.getUTCDate();
+    const month = utcPlusSevenTime.getUTCMonth() + 1;
+    const year = utcPlusSevenTime.getUTCFullYear();
+
+    if (hours.length === 1) {
+      hours = '0' + hours;
+    }
+    if (minutes.length === 1 ){
+      minutes = '0'+ minutes;
+    }
+    
     if (selectZone.paytype === "Month") {
       dateEnd.setDate(dateEnd.getDate() + 30);
     } else {
@@ -138,14 +158,20 @@ exports.rentStall = async (req, res) => {
 
     const rentStall = new SubStall({
       market: market,
+      market_name: market.name,
       stall: selectZone,
+      zone: selectZone.zone,
       user: req.user,
       merchant: req.user.name,
       number: number,
       dateStart: dateStart,
       dateEnd: dateEnd,
       payment: payment,
+      transfer_date: `${date}/${month}/${year}`,
+      transfer_time: `${hours}:${minutes}`,
+      price: selectZone.price,
     });
+    
     await rentStall.save();
     return res.status(200).send({ status: "Rent Stall successful" });
   } catch (err) {

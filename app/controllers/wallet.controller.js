@@ -45,6 +45,7 @@ exports.Withdraw = async (req, res) => {
     const user = await User.findById(req.user);
     const money = await Wallet.findOne({ owner: user });
     const currentmoney = money.money;
+
     const now = new Date();
     const timezoneOffsetInMs = now.getTimezoneOffset() * 60 * 1000;
     const utcPlusSevenTimeInMs =
@@ -56,13 +57,13 @@ exports.Withdraw = async (req, res) => {
     const date = utcPlusSevenTime.getUTCDate();
     const month = utcPlusSevenTime.getUTCMonth() + 1;
     const year = utcPlusSevenTime.getUTCFullYear();
-
+    
     const withdraw = new Withdraw({
       name: money.name,
       bank_number: money.bank_number,
       money: currentmoney,
       date: `${date}/${month}/${year}`,
-      time: `${hours}:${minutes}:${seconds}`,
+      time: `${hours}:${minutes}`,
       owner: user,
     });
     await withdraw.save();
