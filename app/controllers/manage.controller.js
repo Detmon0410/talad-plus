@@ -134,12 +134,12 @@ exports.rentStall = async (req, res) => {
     const year = utcPlusSevenTime.getUTCFullYear();
 
     if (hours.length === 1) {
-      hours = '0' + hours;
+      hours = "0" + hours;
     }
-    if (minutes.length === 1 ){
-      minutes = '0'+ minutes;
+    if (minutes.length === 1) {
+      minutes = "0" + minutes;
     }
-    
+
     if (selectZone.paytype === "Month") {
       dateEnd.setDate(dateEnd.getDate() + 30);
     } else {
@@ -149,7 +149,7 @@ exports.rentStall = async (req, res) => {
     if (!selectZone.market.equals(market._id)) {
       return res.status(403).send({ message: "Stall doesn't match market" });
     }
-    if (req.user.role !== "user") {
+    if (req.user.role !== "Merchant") {
       return res.status(403).send({ message: "Market owner can't rent stall" });
     }
     if (!(number >= selectZone.startNum && number <= selectZone.endNum)) {
@@ -171,7 +171,7 @@ exports.rentStall = async (req, res) => {
       transfer_time: `${hours}:${minutes}`,
       price: selectZone.price,
     });
-    
+
     await rentStall.save();
     return res.status(200).send({ status: "Rent Stall successful" });
   } catch (err) {
