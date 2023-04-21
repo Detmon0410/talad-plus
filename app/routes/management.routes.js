@@ -46,6 +46,11 @@ module.exports = function (app) {
     [authJwt.verifyToken],
     manageController.rentedMultipleStatusChange
   );
+  router.delete(
+    "/market/:marketId/stall/reject",
+    [authJwt.verifyToken],
+    manageController.deteleSubStall
+  );
 
   router.get(
     "/mprofile/:marketId",
@@ -58,7 +63,11 @@ module.exports = function (app) {
     manageController.userRentedStallList
   );
 
-  router.delete("/:id/stalldelete", [authJwt.verifyToken],manageController.deteleSubStall);
+  router.delete(
+    "/delete",
+    [authJwt.verifyToken],
+    manageController.deteleSubStall
+  );
 
   app.use("/apis/manage", router);
 };

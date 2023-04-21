@@ -15,15 +15,11 @@ module.exports = function (app) {
   router.get("/donate", marketController.getMarketDonatePriority);
   router.get("/near", marketController.getMarketNearMe);
   router.post("/register", authJwt.verifyToken, marketController.register);
+  router.post("/review", authJwt.verifyToken, marketController.ReviewMarket);
   router.patch("/:id", marketController.editMarket);
   router.delete("/:id", marketController.deteleMarket);
 
   router.patch("/:id/setdonate", marketController.setDonate);
-  router.post(
-    "/:id/review",
-    authJwt.verifyToken,
-    marketController.ReviewMarket
-  );
   router.get(
     "/:marketId/review",
     authJwt.verifyToken,

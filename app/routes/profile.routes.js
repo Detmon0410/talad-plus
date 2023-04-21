@@ -10,30 +10,34 @@ module.exports = function (app) {
     );
     next();
   });
-
-  router.get("/:user", [authJwt.verifyToken], profileController.getMyProfile);
-  router.patch("/:id/", [authJwt.verifyToken], profileController.editProfile);
   router.post(
-    "/:register",
-    [authJwt.verifyToken],
-    profileController.createProfile
-  );
-  router.post(
-    "/:user/:report",
+    "/report",
     [authJwt.verifyToken],
     profileController.reportProfile
+  );
+  router.get("/:user", [authJwt.verifyToken], profileController.getMyProfile);
+  router.patch("/:id/", [authJwt.verifyToken], profileController.editProfile);
+  router.get("/:id/report", [authJwt.verifyToken], profileController.getReport);
+  router.post(
+    "/register",
+    [authJwt.verifyToken],
+    profileController.createProfile
   );
   router.get(
     "/user/substall",
     [authJwt.verifyToken],
     profileController.getSubstall
   );
-  router.get("/getreport", [authJwt.verifyToken], profileController.getReport);
   router.post(
     "/registerm",
     [authJwt.verifyToken],
     profileController.merchantregister
   );
 
+  router.get(
+    "/receipt/:stallId",
+    [authJwt.verifyToken],
+    profileController.getSelectedStall
+  );
   app.use("/apis/profile", router);
 };

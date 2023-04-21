@@ -6,12 +6,12 @@ const userSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Profile",
   },
-  stall: {
+  market: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Stall",
+    ref: "Market",
   },
-  topic: String,
   description: String,
+  star: Number,
 });
 
 const UserModel = mongoose.model("Review", userSchema);

@@ -12,6 +12,47 @@ const Wallet = db.wallet;
 
 exports.userPayment = async (req, res) => {
   try {
+    console.log("HERE");
+    const { holdername, cardnumber, cvc } = req.body;
+    const price = 1 * 100;
+    let exp_month = 10;
+    let exp_year = 25;
+    let cardDetails = {
+      card: {
+        name: "JOHN DOE",
+        number: "4242424242424242",
+        expiration_month: exp_month,
+        expiration_year: "20" + exp_year,
+        cvc: "123",
+      },
+    };
+
+    let omise = require("omise")({
+      publicKey: process.env.OMISE_PUBLIC_KEY,
+      secretKey: process.env.OMISE_PRIVATE_KEY,
+    });
+
+    const token = await omise.tokens.create(cardDetails);
+    const customer = await omise.customers.create({
+      email: "john.doe@example.com",
+      description: "John Doe (id: 30)",
+      card: token.id,
+    });
+    const charge = await omise.charges.create({
+      amount: price,
+      currency: "thb",
+      customer: customer.id,
+    });
+    console.log(charge);
+    console.log(charge.amount / 100);
+  } catch (err) {
+    console.log("err", err);
+    res.status(403).send({ Message: err.message });
+  }
+};
+
+exports.userPayment2 = async (req, res) => {
+  try {
     const { name, number, exp_date, cvc } = req.body;
     const substall = await Substall.findById(req.params.payment);
     const stall = await Stall.findById(substall.stall);
@@ -50,16 +91,9 @@ exports.userPayment = async (req, res) => {
         });
       })
       .then(function (charge) {
-        return Wallet.updateOne(
-          { owner: substall.owner },
-          { $inc: { money: 10 } }
-        )
-          .then(() => {
-            res.status(200).send("Payment success");
-          })
-          .catch((err) => {
-            res.status(500).send("Payment fail");
-          });
+        console.log(charge);
+        console.log(charge.amount / 100);
+        // add amount to user's wallet
       })
       .catch(function (err) {
         res.status(500).send("Payment fail");
@@ -82,8 +116,8 @@ exports.addMoney = async (req, res) => {
       { $inc: { money: stall.price } },
       { new: true, upsert: true } // add the upsert option to create a new document if it doesn't exist
     );
-    
-    substall.status = 'success';
+
+    substall.status = "success";
 
     await substall.save();
     await wallet.save();

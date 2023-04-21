@@ -6,6 +6,8 @@ const passport = require("passport");
 const Market = db.market;
 const Stall = db.stall;
 const SubStall = db.subStall;
+const Wallet = db.wallet;
+const Review = db.review;
 
 exports.getMyMarket = async (req, res) => {
   try {
@@ -21,8 +23,24 @@ exports.getSelectedMarket = async (req, res) => {
   try {
     console.log(req.params.marketId);
     const selectedmarket = await Market.findById(req.params.marketId);
-
-    return res.status(200).send(selectedmarket);
+    const star = await Review.find({ market: req.params.marketId });
+    const totalStars = star.reduce((acc, cur) => acc + cur.star, 0);
+    const averageStars = totalStars / star.length;
+    const response = {
+      address: selectedmarket.address,
+      district: selectedmarket.district,
+      img: selectedmarket.img,
+      isDonate: selectedmarket.isDonate,
+      name: selectedmarket.name,
+      owner: selectedmarket.owner,
+      post: selectedmarket.post,
+      province: selectedmarket.province,
+      zone: selectedmarket.zone,
+      _id: selectedmarket._id,
+      totalStars: averageStars,
+    };
+    console.log(response);
+    return res.status(200).send(response);
   } catch (err) {
     console.log(err);
     return res.status(500).send(err);
@@ -114,6 +132,7 @@ exports.getSubStall = async (req, res) => {
 
 exports.rentStall = async (req, res) => {
   try {
+    console.log(req.body);
     const dateStart = new Date(req.body.date); //เรียกจาก payload
     let dateEnd = new Date(dateStart);
     let { number, payment } = req.body;
@@ -173,7 +192,59 @@ exports.rentStall = async (req, res) => {
     });
 
     await rentStall.save();
-    return res.status(200).send({ status: "Rent Stall successful" });
+
+    if (payment == "visa") {
+      console.log("VISA!!!");
+      const holdername = req.body.holdername;
+      const cardnumber = req.body.cardnumber;
+      const exp_year = req.body.exp_year;
+      const exp_month = req.body.exp_month;
+      const cvc = req.body.cvc;
+
+      // simple validation
+      if (!holdername || !cardnumber || !exp_month || !exp_year || !cvc) {
+        return res.status(403).send({ message: "Something missing" });
+      }
+      const price = selectZone.price * 100;
+      let cardDetails = {
+        card: {
+          name: holdername,
+          number: cardnumber,
+          expiration_month: exp_month,
+          expiration_year: "20" + exp_year,
+          cvc: cvc,
+        },
+      };
+
+      let omise = require("omise")({
+        publicKey: process.env.OMISE_PUBLIC_KEY,
+        secretKey: process.env.OMISE_PRIVATE_KEY,
+      });
+
+      const token = await omise.tokens.create(cardDetails);
+      const customer = await omise.customers.create({
+        email: "john.doe@example.com",
+        description: "John Doe (id: 30)",
+        card: token.id,
+      });
+      const charge = await omise.charges.create({
+        amount: price,
+        currency: "thb",
+        customer: customer.id,
+      });
+      console.log(charge);
+      console.log(charge.amount / 100);
+      const addMoney = charge.amount / 100;
+      // add amount to user's wallet
+      const wallet = await Wallet.findOne({ owner: market.owner });
+      currentMoney = wallet.money;
+      wallet.money = currentMoney + addMoney;
+      await wallet.save();
+      const rentStall = await SubStall.findOne({ owner: market.owner });
+      rentStall.status = "success";
+      await rentStall.save();
+    }
+    return res.status(200).send({ Receipt: rentStall._id });
   } catch (err) {
     console.log(err);
     return res.status(500).send(err);
@@ -275,12 +346,7 @@ exports.userRentedStallList = async (req, res) => {
 
 exports.deteleSubStall = async (req, res) => {
   try {
-    const substall = await SubStall.findById(req.params.id);
-    const substall_status = substall.status;
-    if(substall_status == 'success'){
-      return res.status(200).send({status: 'Success payment can not cancel'})
-    }
-    await SubStall.findByIdAndDelete(req.params.id);
+    await SubStall.findByIdAndDelete(req.params.marketId);
     return res.status(200).send({ status: "Stall canceled" });
   } catch (err) {
     console.log(err);

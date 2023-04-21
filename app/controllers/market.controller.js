@@ -138,16 +138,15 @@ exports.deteleMarket = async (req, res) => {
 
 exports.ReviewMarket = async (req, res) => {
   try {
-    const user = await User.findById(req.params.review);
-    const profile = await Profile.find({ merchant: user });
-    const stall = await Market.findById(req.params.id);
-    const { topic, description, star } = req.body;
+    const user = await User.findById(req.user);
+    const profile = await Profile.findOne({ merchant: user });
+    const market = await Market.findById(req.body.market);
+    const { description, rating } = req.body;
     const review = new Review({
-      profile: profile._id,
-      stall: stall,
-      topic: topic,
+      profile: profile,
+      market: market,
       description: description,
-      star: star,
+      star: rating,
     });
 
     await review.save();
@@ -160,8 +159,9 @@ exports.ReviewMarket = async (req, res) => {
 
 exports.getReview = async (req, res) => {
   try {
-    const review = await Review.find({ market: req.params.marketId });
-    return res.status(200).send(review);
+    const market = await Market.findById(req.params.marketId);
+    const reviews = await Review.find({ market: market }).populate("profile");
+    return res.status(200).send(reviews);
   } catch (err) {
     console.log(err);
     return res.status(500).send(err);
