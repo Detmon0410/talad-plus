@@ -184,17 +184,27 @@ exports.getReview = async (req, res) => {
 
 exports.SearchByDistrict = async (req, res) => {
   try {
-    const { district } = req.body;
-    const results = await Market.find({ district: district });
+    const province = req.query.province;
+    const district = req.query.district;
 
-    if (results.length === 0) {
-      return res.status(404).send({ error: 'No documents found' });
+    if (district.length !== 0) {
+      const results = await Market.find({ district: district });
+      return res.status(200).send(results);
+    }
+
+    if (province.length !== 0) {
+      const results = await Market.find({ province: province });
+      return res.status(200).send(results);
+    }
+
+    if (province.length === 0) {
+      return res.status(404).send({ error: "No documents found" });
     }
 
     return res.status(200).send(results);
   } catch (err) {
     console.log(err);
-    return res.status(500).send({ error: 'An error occurred' });
+    return res.status(500).send({ error: "An error occurred" });
   }
 };
 
@@ -204,18 +214,12 @@ exports.SearchByName = async (req, res) => {
     const results = await Market.find({ name: { $regex: name } });
 
     if (results.length === 0) {
-      
-      return res.status(404).send({ error: 'No documents found' });
+      return res.status(404).send({ error: "No documents found" });
     }
 
     return res.status(200).send(results);
   } catch (err) {
     console.log(err);
-    return res.status(500).send({ error: 'An error occurred' });
+    return res.status(500).send({ error: "An error occurred" });
   }
 };
-
-
-
-
-

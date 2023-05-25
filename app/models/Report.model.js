@@ -12,6 +12,7 @@ const userSchema = new Schema({
   },
   description: String,
   star: Number,
+  time: String,
 });
 
 const UserModel = mongoose.model("Report", userSchema);

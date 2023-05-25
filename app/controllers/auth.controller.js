@@ -61,10 +61,10 @@ exports.login = async (req, res) => {
 //api register
 exports.register = async (req, res) => {
   try {
-    const { username, password, name, email, role } = req.body;
+    const { username, password, email, role } = req.body;
 
     // simple validation
-    if (!name || !username || !password || !email) {
+    if (!username || !password || !email) {
       return res.status(403).send({ message: "Please try again" });
     }
 
@@ -78,7 +78,6 @@ exports.register = async (req, res) => {
         .send({ message: "username or email is duplicated" });
     }
     const user = new User({
-      name: name,
       username: username,
       password: passwordHash,
       role: role,
