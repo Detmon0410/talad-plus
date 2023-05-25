@@ -142,11 +142,25 @@ exports.ReviewMarket = async (req, res) => {
     const profile = await Profile.findOne({ merchant: user });
     const market = await Market.findById(req.body.market);
     const { description, rating } = req.body;
+
+    const now = new Date();
+    const timezoneOffsetInMs = now.getTimezoneOffset() * 60 * 1000;
+    const utcPlusSevenTimeInMs =
+      now.getTime() + 7 * 60 * 60 * 1000 + timezoneOffsetInMs;
+    const utcPlusSevenTime = new Date(utcPlusSevenTimeInMs);
+    const hours = utcPlusSevenTime.getHours();
+    const minutes = utcPlusSevenTime.getMinutes();
+    const seconds = utcPlusSevenTime.getSeconds();
+    const date = utcPlusSevenTime.getUTCDate();
+    const month = utcPlusSevenTime.getUTCMonth() + 1;
+    const year = utcPlusSevenTime.getUTCFullYear();
+
     const review = new Review({
       profile: profile,
       market: market,
       description: description,
       star: rating,
+      time: `${date}/${month}/${year} ${hours}:${minutes}`,
     });
 
     await review.save();
@@ -167,3 +181,41 @@ exports.getReview = async (req, res) => {
     return res.status(500).send(err);
   }
 };
+
+exports.SearchByDistrict = async (req, res) => {
+  try {
+    const { district } = req.body;
+    const results = await Market.find({ district: district });
+
+    if (results.length === 0) {
+      return res.status(404).send({ error: 'No documents found' });
+    }
+
+    return res.status(200).send(results);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send({ error: 'An error occurred' });
+  }
+};
+
+exports.SearchByName = async (req, res) => {
+  try {
+    const { name } = req.body;
+    const results = await Market.find({ name: { $regex: name } });
+
+    if (results.length === 0) {
+      
+      return res.status(404).send({ error: 'No documents found' });
+    }
+
+    return res.status(200).send(results);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send({ error: 'An error occurred' });
+  }
+};
+
+
+
+
+

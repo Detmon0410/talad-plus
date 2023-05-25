@@ -26,5 +26,8 @@ module.exports = function (app) {
     marketController.getReview
   );
 
+  router.get("/search", authJwt.verifyToken, marketController.SearchByDistrict);
+  router.get("/search/name", authJwt.verifyToken, marketController.SearchByName);
+
   app.use("/apis/market", router);
 };

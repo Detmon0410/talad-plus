@@ -77,11 +77,25 @@ exports.reportProfile = async (req, res) => {
     const userReq = await User.findById(req.body.merchant);
     const profile = await Profile.findOne({ merchant: userReq });
     const { description, rating } = req.body;
+
+    const now = new Date();
+    const timezoneOffsetInMs = now.getTimezoneOffset() * 60 * 1000;
+    const utcPlusSevenTimeInMs =
+      now.getTime() + 7 * 60 * 60 * 1000 + timezoneOffsetInMs;
+    const utcPlusSevenTime = new Date(utcPlusSevenTimeInMs);
+    const hours = utcPlusSevenTime.getHours();
+    const minutes = utcPlusSevenTime.getMinutes();
+    const seconds = utcPlusSevenTime.getSeconds();
+    const date = utcPlusSevenTime.getUTCDate();
+    const month = utcPlusSevenTime.getUTCMonth() + 1;
+    const year = utcPlusSevenTime.getUTCFullYear();
+
     const report = new Report({
       profile: profile,
       reporter: user,
       description: description,
       star: rating,
+      time: `${date}/${month}/${year} ${hours}:${minutes}`,
     });
     await report.save();
     return res.status(201).send({ message: "Report successfully" });

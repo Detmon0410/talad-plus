@@ -8,6 +8,7 @@ const userSchema = new Schema({
     type: Number,
     default: 0,
   },
+  bank_name: String,
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
