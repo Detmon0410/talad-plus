@@ -8,6 +8,7 @@ const Stall = db.stall;
 const User = db.user;
 const Profile = db.profile;
 const Review = db.review;
+const Image = db.image;
 
 //api register
 exports.register = async (req, res) => {
@@ -50,6 +51,12 @@ exports.register = async (req, res) => {
     market.imglicense = image_b64_license;
     market.img = image_b64;
     await market.save();
+
+    const image = new Image({
+      market: market,
+    });
+    await image.save();
+
     return res.status(201).send({ message: "Register successfully" });
   } catch (err) {
     console.log(err);
@@ -125,7 +132,7 @@ exports.editMarket = async (req, res) => {
     return res.status(500).send({ status: "please try again" });
   }
 };
-
+ 
 exports.deteleMarket = async (req, res) => {
   try {
     await Market.findByIdAndDelete(req.params.id);

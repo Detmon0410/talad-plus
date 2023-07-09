@@ -15,5 +15,6 @@ db.report = require("./Report.model");
 db.review = require("./Review.model");
 db.wallet = require("./Wallet.model");
 db.withdraw = require("./Withdraw.model");
+db.image = require("./Image.model");
 
 module.exports = db;

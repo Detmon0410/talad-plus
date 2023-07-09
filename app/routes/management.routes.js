@@ -69,5 +69,10 @@ module.exports = function (app) {
     manageController.deteleSubStall
   );
 
+  router.post(
+    "/uploadimage",
+    [authJwt.verifyToken],
+    manageController.uploadImages
+  );
   app.use("/apis/manage", router);
 };

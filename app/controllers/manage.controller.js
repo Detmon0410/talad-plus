@@ -8,6 +8,7 @@ const Stall = db.stall;
 const SubStall = db.subStall;
 const Wallet = db.wallet;
 const Review = db.review;
+const Image = db.image;
 
 exports.getMyMarket = async (req, res) => {
   try {
@@ -351,5 +352,29 @@ exports.deteleSubStall = async (req, res) => {
   } catch (err) {
     console.log(err);
     return res.status(500).send(err);
+  }
+};
+
+exports.uploadImages = async (req, res) => {
+  try{
+  const market = await Market.findById(req.body.market);
+  const img = await Image.findOne({market: market});
+
+  let image_b64 = "";
+  if (img.image.length >= 9) {
+    return res.status(400).send({ error: 'Maximum image count reached' });
+  }
+
+  if (req.files) {
+    image_data = req.files.img;
+    image_b64 = image_data.data.toString("base64");
+    img.image.push(image_b64);
+    await img.save();
+  }
+  return res.status(200).send({ image_b64 });
+  }
+  catch (err) {
+    console.log(err);
+    return res.status(500).send({ error: 'An error occurred' });
   }
 };
