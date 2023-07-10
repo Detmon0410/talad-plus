@@ -52,11 +52,6 @@ exports.register = async (req, res) => {
     market.img = image_b64;
     await market.save();
 
-    const image = new Image({
-      market: market,
-    });
-    await image.save();
-
     return res.status(201).send({ message: "Register successfully" });
   } catch (err) {
     console.log(err);

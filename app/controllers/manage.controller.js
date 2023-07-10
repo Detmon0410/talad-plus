@@ -357,24 +357,48 @@ exports.deteleSubStall = async (req, res) => {
 
 exports.uploadImages = async (req, res) => {
   try{
-  const market = await Market.findById(req.body.market);
-  const img = await Image.findOne({market: market});
+    const market = await Market.findById(req.body.market);
+    const img = await Image.findOne({market: market});
+    let image_b64 = "";
 
-  let image_b64 = "";
-  if (img.image.length >= 9) {
-    return res.status(400).send({ error: 'Maximum image count reached' });
-  }
+    if (!img) {
+      const image = new Image({
+        market: market,
+      });
+      if (req.files) {
+        image_data = req.files.img;
+        image_b64 = image_data.data.toString("base64");
+        image.image.push(image_b64);
+        await image.save();
+        return res.status(200).send({ message:'Save Image Successfully' });
+      }
+    }
 
-  if (req.files) {
-    image_data = req.files.img;
-    image_b64 = image_data.data.toString("base64");
-    img.image.push(image_b64);
-    await img.save();
-  }
-  return res.status(200).send({ image_b64 });
-  }
-  catch (err) {
+    if (img.image.length >= 9) {
+      return res.status(400).send({ error: 'Maximum image count reached' });
+    }
+
+    if (req.files) {
+      image_data = req.files.img;
+      image_b64 = image_data.data.toString("base64");
+      img.image.push(image_b64);
+      await img.save();
+      return res.status(200).send({ message:'Save Image Successfully' });
+    }
+    }
+    catch (err) {
+      console.log(err);
+      return res.status(500).send({ error: 'An error occurred' });
+    }
+};
+
+exports.getImages = async (req, res) => {
+  try {
+    const market = await Market.findById(req.body.market);
+    const img = await Image.findOne({market: market});
+    return res.status(200).send(img);
+  } catch (err) {
     console.log(err);
-    return res.status(500).send({ error: 'An error occurred' });
+    return res.status(500).send(err);
   }
 };
