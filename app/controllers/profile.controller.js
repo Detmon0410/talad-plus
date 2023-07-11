@@ -12,6 +12,7 @@ const Report = db.report;
 const Substall = db.subStall;
 const Market = db.market;
 const Stall = db.stall;
+const Favorite = db.favorite;
 
 exports.editProfile = async (req, res) => {
   try {
@@ -167,6 +168,60 @@ exports.getSelectedStall = async (req, res) => {
     const SelectedStall = await Substall.findById(req.params.stallId);
 
     return res.status(200).send(SelectedStall);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send(err);
+  }
+};
+
+exports.favoriteMarket = async (req, res) => {
+  try{
+    const user = await User.findById(req.user);
+    const market = await Market.findById(req.body.market);
+    const profile = await Profile.findOne({merchant: user});
+    const favorite = await Favorite.findOne({profile: profile});
+    if (!favorite) {
+      const fav = new Favorite({
+        profile: profile,
+      });
+      fav.market.push(market);
+      await fav.save();
+      return res.status(200).send({ message:'Saved' });
+    }
+
+    favorite.market.push(market);
+    await favorite.save();
+    return res.status(200).send({ message:'Saved' });
+  }
+    catch (err) {
+      console.log(err);
+      return res.status(500).send({ error: 'An error occurred' });
+    }
+};
+
+exports.deletefavoriteMarket = async (req, res) => {
+  try{
+    const user = await User.findById(req.user);
+    const market = await Market.findById(req.body.market);
+    const profile = await Profile.findOne({merchant: user});
+    const favorite = await Favorite.findOne({profile: profile});
+
+    favorite.market.splice(market, 1);
+    await favorite.save();
+    return res.status(200).send({ message:'Saved' });
+  }
+    catch (err) {
+      console.log(err);
+      return res.status(500).send({ error: 'An error occurred' });
+    }
+};
+
+exports.getMyFavorite = async (req, res) => {
+  try {
+    const user = await User.findById(req.user);
+    const profile = await Profile.findOne({merchant: user});
+    const favorite = await Favorite.findOne({profile: profile});
+    return res.status(200).send(favorite);
   } catch (err) {
     console.log(err);
     return res.status(500).send(err);

@@ -40,4 +40,25 @@ module.exports = function (app) {
     profileController.getSelectedStall
   );
   app.use("/apis/profile", router);
+
+  router.post(
+    "/favorite",
+    [authJwt.verifyToken],
+    profileController.favoriteMarket
+  );
+  app.use("/apis/profile", router);
+
+  router.post(
+    "/deletefavorite",
+    [authJwt.verifyToken],
+    profileController.deletefavoriteMarket
+  );
+  app.use("/apis/profile", router);
+
+  router.get(
+    "/user/myfavorite",
+    [authJwt.verifyToken],
+    profileController.getMyFavorite
+  );
+  app.use("/apis/profile", router);
 };
