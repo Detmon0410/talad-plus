@@ -109,6 +109,7 @@ exports.reportProfile = async (req, res) => {
 exports.merchantregister = async (req, res) => {
   try {
     const { name, phone, address, district, province, post } = req.body;
+    console.log(req.body);
     let image_b64 = "";
     if (req.files) {
       image_data = req.files.img;
