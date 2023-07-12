@@ -175,52 +175,53 @@ exports.getSelectedStall = async (req, res) => {
 };
 
 exports.favoriteMarket = async (req, res) => {
-  try{
+  try {
     const user = await User.findById(req.user);
-    const market = await Market.findById(req.body.market);
-    const profile = await Profile.findOne({merchant: user});
-    const favorite = await Favorite.findOne({profile: profile});
+    const market = await Market.findById(req.body.marketId);
+    const profile = await Profile.findOne({ merchant: user });
+    const favorite = await Favorite.findOne({ profile: profile });
+    console.log(req.body);
     if (!favorite) {
       const fav = new Favorite({
         profile: profile,
       });
       fav.market.push(market);
       await fav.save();
-      return res.status(200).send({ message:'Saved' });
+      return res.status(200).send({ message: "Saved" });
     }
 
     favorite.market.push(market);
     await favorite.save();
-    return res.status(200).send({ message:'Saved' });
+    return res.status(200).send({ message: "Saved" });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send({ error: "An error occurred" });
   }
-    catch (err) {
-      console.log(err);
-      return res.status(500).send({ error: 'An error occurred' });
-    }
 };
 
 exports.deletefavoriteMarket = async (req, res) => {
-  try{
+  try {
     const user = await User.findById(req.user);
     const market = await Market.findById(req.body.market);
-    const profile = await Profile.findOne({merchant: user});
-    const favorite = await Favorite.findOne({profile: profile});
+    const profile = await Profile.findOne({ merchant: user });
+    const favorite = await Favorite.findOne({ profile: profile });
 
     favorite.market.splice(market, 1);
     await favorite.save();
-    return res.status(200).send({ message:'Saved' });
+    return res.status(200).send({ message: "Saved" });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send({ error: "An error occurred" });
   }
-    catch (err) {
-      console.log(err);
-      return res.status(500).send({ error: 'An error occurred' });
-    }
 };
 
 exports.getMyFavorite = async (req, res) => {
   try {
     const user = await User.findById(req.user);
-    const profile = await Profile.findOne({merchant: user});
-    const favorite = await Favorite.findOne({profile: profile});
+    const profile = await Profile.findOne({ merchant: user });
+    const favorite = await Favorite.findOne({ profile: profile }).populate(
+      "market"
+    );
     return res.status(200).send(favorite);
   } catch (err) {
     console.log(err);

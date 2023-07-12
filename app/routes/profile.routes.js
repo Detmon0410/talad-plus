@@ -39,21 +39,18 @@ module.exports = function (app) {
     [authJwt.verifyToken],
     profileController.getSelectedStall
   );
-  app.use("/apis/profile", router);
 
   router.post(
     "/favorite",
     [authJwt.verifyToken],
     profileController.favoriteMarket
   );
-  app.use("/apis/profile", router);
 
   router.post(
     "/deletefavorite",
     [authJwt.verifyToken],
     profileController.deletefavoriteMarket
   );
-  app.use("/apis/profile", router);
 
   router.get(
     "/user/myfavorite",
