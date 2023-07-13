@@ -127,7 +127,7 @@ exports.editMarket = async (req, res) => {
     return res.status(500).send({ status: "please try again" });
   }
 };
- 
+
 exports.deteleMarket = async (req, res) => {
   try {
     await Market.findByIdAndDelete(req.params.id);

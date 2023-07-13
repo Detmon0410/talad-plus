@@ -137,10 +137,8 @@ exports.rentStall = async (req, res) => {
     const dateStart = new Date(req.body.date); //เรียกจาก payload
     let dateEnd = new Date(dateStart);
     let { number, payment } = req.body;
-
     const market = await Market.findById(req.params.marketId);
     const selectZone = await Stall.findById(req.params.stallId);
-
     const now = new Date();
     const timezoneOffsetInMs = now.getTimezoneOffset() * 60 * 1000;
     const utcPlusSevenTimeInMs =
@@ -357,7 +355,7 @@ exports.deteleSubStall = async (req, res) => {
 
 exports.uploadImages = async (req, res) => {
   try {
-    console.log(req.body);
+    console.log(req.files);
     const market = await Market.findById(req.body.market);
     const img = await Image.findOne({ market: market });
     let image_b64 = "";
@@ -375,10 +373,6 @@ exports.uploadImages = async (req, res) => {
       }
     }
 
-    if (img.image.length >= 9) {
-      return res.status(400).send({ error: "Maximum image count reached" });
-    }
-
     if (req.files) {
       image_data = req.files.img;
       image_b64 = image_data.data.toString("base64");
@@ -394,8 +388,8 @@ exports.uploadImages = async (req, res) => {
 
 exports.getImages = async (req, res) => {
   try {
-    const market = await Market.findById(req.body.market);
-    const img = await Image.findOne({ market: market });
+    const market = await Market.findById(req.params.marketId);
+    const img = await Image.findOne({ market: market }).populate("image");
     return res.status(200).send(img);
   } catch (err) {
     console.log(err);

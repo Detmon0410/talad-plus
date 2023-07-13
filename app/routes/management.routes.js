@@ -75,6 +75,10 @@ module.exports = function (app) {
     manageController.uploadImages
   );
 
-  router.get("/getimage", [authJwt.verifyToken], manageController.getImages);
+  router.get(
+    "/:marketId/getimage",
+    [authJwt.verifyToken],
+    manageController.getImages
+  );
   app.use("/apis/manage", router);
 };

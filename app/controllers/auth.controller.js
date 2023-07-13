@@ -43,6 +43,7 @@ exports.login = async (req, res) => {
         role: user.role,
         img: myUser.img,
         uid: myMarket._id,
+        oid: user._id,
       });
     }
     const myUser = await Profile.findOne({ merchant: user });
