@@ -80,5 +80,12 @@ module.exports = function (app) {
     [authJwt.verifyToken],
     manageController.getImages
   );
+
+  router.post(
+    "/deleteimage",
+    [authJwt.verifyToken],
+    manageController.deleteImages
+  );
+
   app.use("/apis/manage", router);
 };

@@ -396,3 +396,18 @@ exports.getImages = async (req, res) => {
     return res.status(500).send(err);
   }
 };
+
+exports.deleteImages = async (req, res) => {
+  try {
+    const image = req.params;
+    const user = req.user;
+    const market = await Market.findOne({ owner: user });
+    const img = await Image.findOne({market: market});
+    img.market.splice(image, 1);
+    await img.save();
+    return res.status(200).send({ message: "Deleted" });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send({ error: "An error occurred" });
+  }
+};
