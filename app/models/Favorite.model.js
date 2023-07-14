@@ -4,14 +4,13 @@ const Schema = mongoose.Schema;
 const userSchema = new Schema({
   profile: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Profile",
+    ref: "User",
   },
-  market:{
+  market: {
     type: [mongoose.Schema.Types.ObjectId],
     ref: "Market",
-  }
+  },
 });
 
 const UserModel = mongoose.model("Favorite", userSchema);
-
 module.exports = UserModel;

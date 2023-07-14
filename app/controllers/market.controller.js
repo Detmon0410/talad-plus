@@ -61,7 +61,10 @@ exports.register = async (req, res) => {
 
 exports.getAllMarket = async (req, res) => {
   try {
-    const allMarket = await Market.find();
+    const allMarket = await Market.aggregate([
+      { $sample: { size: 10 } }, // Adjust the size according to your requirements
+    ]);
+
     return res.status(200).send(allMarket);
   } catch (err) {
     console.log(err);
