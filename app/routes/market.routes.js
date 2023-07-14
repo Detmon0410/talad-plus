@@ -28,6 +28,7 @@ module.exports = function (app) {
 
   router.get("/search", authJwt.verifyToken, marketController.SearchByDistrict);
   router.get("/search/name", authJwt.verifyToken, marketController.SearchByName);
+  router.patch("/:detail", marketController.editDetail);
 
   app.use("/apis/market", router);
 };

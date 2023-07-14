@@ -41,7 +41,7 @@ exports.login = async (req, res) => {
       return res.status(200).send({
         name: user.name,
         role: user.role,
-        img: myUser.img,
+        img: myMarket.img,
         uid: myMarket._id,
         oid: user._id,
       });

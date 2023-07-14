@@ -21,6 +21,7 @@ const userSchema = new Schema({
   post: String,
   img: String,
   imglicense: String,
+  detail: String,
   isDonate: { type: Boolean, default: false },
 });
 

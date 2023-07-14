@@ -47,6 +47,7 @@ exports.register = async (req, res) => {
     }
     const market = new Market(req.body);
 
+    market.detail = '';
     market.owner = req.user;
     market.imglicense = image_b64_license;
     market.img = image_b64;
@@ -226,5 +227,19 @@ exports.SearchByName = async (req, res) => {
   } catch (err) {
     console.log(err);
     return res.status(500).send({ error: "An error occurred" });
+  }
+};
+
+exports.editDetail = async (req, res) => {
+  try {
+    const detail = req.body;
+    const market = await Market.findByIdAndUpdate(req.params.id, data, {
+      new: true,
+    });
+    await update.save();
+    return res.status(200).send({ status: "Market edited" });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send({ status: "please try again" });
   }
 };
