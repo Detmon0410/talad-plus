@@ -9,6 +9,8 @@ const User = db.user;
 const Profile = db.profile;
 const Review = db.review;
 const Image = db.image;
+const Withdraw = db.withdraw;
+const Donate = db.donate;
 
 //api register
 exports.register = async (req, res) => {
@@ -238,6 +240,125 @@ exports.editDetail = async (req, res) => {
     });
     await update.save();
     return res.status(200).send({ status: "Market edited" });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send({ status: "please try again" });
+  }
+};
+
+
+exports.buyAdvertisement = async (req, res) => {
+  try {
+    const money = '99'
+    const payment = 'visa';
+    
+    const now = new Date();
+    const timezoneOffsetInMs = now.getTimezoneOffset() * 60 * 1000;
+    const utcPlusSevenTimeInMs = now.getTime() + 7 * 60 * 60 * 1000 + timezoneOffsetInMs;
+    const utcPlusSevenTime = new Date(utcPlusSevenTimeInMs);
+    const hours = utcPlusSevenTime.getHours().toString().padStart(2, '0');
+    const minutes = utcPlusSevenTime.getMinutes().toString().padStart(2, '0');
+    const seconds = utcPlusSevenTime.getSeconds().toString().padStart(2, '0');
+    const date = utcPlusSevenTime.getUTCDate();
+    const month = utcPlusSevenTime.getUTCMonth() + 1;
+    const year = utcPlusSevenTime.getUTCFullYear();
+
+    const now1 = new Date();
+    now1.setDate(now.getDate() + 30);
+    const timezoneOffsetInMs1 = now.getTimezoneOffset() * 60 * 1000;
+    const utcPlusSevenTimeInMs1 = now.getTime() + 7 * 60 * 60 * 1000 + timezoneOffsetInMs;
+    const utcPlusSevenTime1 = new Date(utcPlusSevenTimeInMs);
+    const hours1 = utcPlusSevenTime.getHours().toString().padStart(2, '0');;
+    const minutes1 = utcPlusSevenTime.getMinutes().toString().padStart(2, '0');;
+    const seconds1 = utcPlusSevenTime.getSeconds().toString().padStart(2, '0');;
+    const date1 = utcPlusSevenTime.getUTCDate();
+    const month1 = utcPlusSevenTime.getUTCMonth() + 1;
+    const year1    = utcPlusSevenTime.getUTCFullYear();
+
+    if (payment == "visa") {
+      console.log("VISA!!!");
+      const holdername = "JOHN DOE"//req.body.holdername;
+      const cardnumber = "4242424242424242"//req.body.cardnumber;
+      const exp_year = '24'//req.body.exp_year;
+      const exp_month = '10'//req.body.exp_month;
+      const cvc = '123'//req.body.cvc;
+
+      // simple validation
+      if (!holdername || !cardnumber || !exp_month || !exp_year || !cvc) {
+        return res.status(403).send({ message: "Something missing" });
+      }
+      const price = money * 100;
+      let cardDetails = {
+        card: {
+          name: holdername,
+          number: cardnumber,
+          expiration_month: exp_month,
+          expiration_year: "20" + exp_year,
+          cvc: cvc,
+        },
+      };
+
+      let omise = require("omise")({
+        publicKey: process.env.OMISE_PUBLIC_KEY,
+        secretKey: process.env.OMISE_PRIVATE_KEY,
+      });
+
+      const token = await omise.tokens.create(cardDetails);
+      const customer = await omise.customers.create({
+        email: "john.doe@example.com",
+        description: "John Doe (id: 30)",
+        card: token.id,
+      });
+      const charge = await omise.charges.create({
+        amount: price,
+        currency: "thb",
+        customer: customer.id,
+      });
+      console.log(charge);
+      console.log(charge.amount / 100);
+      
+      const market = await Market.findById(req.params.market);
+      market.isDonate = !market.isDonate;
+      await market.save();
+
+      const user = market.owner;
+      const history = new Withdraw({
+        name: money.name,
+        bank_number: money.bank_number,
+        money: money,
+        date: `${date}/${month}/${year}`,
+        time: `${hours}:${minutes}`,
+        status: 'ค่าโปรโมทตลาด',
+        owner: user,
+      });
+      await history.save();
+      
+      const donate = new Donate({
+        market: req.params.market,    
+        name: market.name,
+        startDate: `${date}/${month}/${year}`,
+        endDate: `${date1}/${month1}/${year1}`,
+        status: 'Activate'
+      });
+      await donate.save();
+      return res.status(200).send({ status: market.isDonate });
+    }
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send(err);
+  }
+};
+
+exports.donateStatus = async (req, res) => {
+  try {
+    const market = req.paraams.market;   
+    market.isDonate = !market.isDonate;
+    await market.save();
+    const donate   = await Donate.findOneAndUpdate({market: market},  {status: 'Deactivated'}, {
+      new: true,
+    });
+    await donate.save();
+    return res.status(200).send({ status: "Deactivated" });
   } catch (err) {
     console.log(err);
     return res.status(500).send({ status: "please try again" });

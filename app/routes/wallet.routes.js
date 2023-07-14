@@ -15,6 +15,7 @@ module.exports = function (app) {
   router.get("/me", [authJwt.verifyToken], walletController.getMyWallet);
   router.patch("/withdraw", [authJwt.verifyToken], walletController.Withdraw);
   router.get("/history", [authJwt.verifyToken], walletController.getMyWithdraw);
+  router.post("/topup", [authJwt.verifyToken], walletController.Topup);
 
   app.use("/apis/wallet", router);
 };

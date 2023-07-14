@@ -52,16 +52,16 @@ exports.Withdraw = async (req, res) => {
     const utcPlusSevenTimeInMs =
       now.getTime() + 7 * 60 * 60 * 1000 + timezoneOffsetInMs;
     const utcPlusSevenTime = new Date(utcPlusSevenTimeInMs);
-    const hours = utcPlusSevenTime.getHours();
-    const minutes = utcPlusSevenTime.getMinutes();
-    const seconds = utcPlusSevenTime.getSeconds();
+    const hours = utcPlusSevenTime.getHours().toString().padStart(2, '0');
+    const minutes = utcPlusSevenTime.getMinutes().toString().padStart(2, '0');
+    const seconds = utcPlusSevenTime.getSeconds().toString().padStart(2, '0');
     const date = utcPlusSevenTime.getUTCDate();
     const month = utcPlusSevenTime.getUTCMonth() + 1;
     const year = utcPlusSevenTime.getUTCFullYear();
-    
+
+
     const withdraw = new Withdraw({
       name: money.name,
-      bank_number: money.bank_number,
       money: currentmoney,
       date: `${date}/${month}/${year}`,
       time: `${hours}:${minutes}`,
@@ -87,6 +87,84 @@ exports.getMyWithdraw = async (req, res) => {
     const wallet = await Withdraw.find({ owner: user }).select("-_id");
 
     return res.status(200).send(wallet);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send(err);
+  }
+};
+
+exports.Topup = async (req, res) => {
+  try {
+    let { money, payment } = req.body;
+    const user = req.user;
+    const now = new Date();
+    const timezoneOffsetInMs = now.getTimezoneOffset() * 60 * 1000;
+    const utcPlusSevenTimeInMs =
+      now.getTime() + 7 * 60 * 60 * 1000 + timezoneOffsetInMs;
+    const utcPlusSevenTime = new Date(utcPlusSevenTimeInMs);
+    const hours = utcPlusSevenTime.getHours().toString().padStart(2, '0');
+    const minutes = utcPlusSevenTime.getMinutes().toString().padStart(2, '0');
+    const seconds = utcPlusSevenTime.getSeconds().toString().padStart(2, '0');
+    const date = utcPlusSevenTime.getUTCDate();
+    const month = utcPlusSevenTime.getUTCMonth() + 1;
+    const year = utcPlusSevenTime.getUTCFullYear();
+
+    if (hours.length === 1) {
+      hours = "0" + hours;
+    }
+    if (minutes.length === 1) {
+      minutes = "0" + minutes;
+    }
+
+    if (payment == "visa") {
+      console.log("VISA!!!");
+      const holdername = req.body.holdername;
+      const cardnumber = req.body.cardnumber;
+      const exp_year = req.body.exp_year;
+      const exp_month = req.body.exp_month;
+      const cvc = req.body.cvc;
+
+      // simple validation
+      if (!holdername || !cardnumber || !exp_month || !exp_year || !cvc) {
+        return res.status(403).send({ message: "Something missing" });
+      }
+      const price = money * 100;
+      let cardDetails = {
+        card: {
+          name: holdername,
+          number: cardnumber,
+          expiration_month: exp_month,
+          expiration_year: "20" + exp_year,
+          cvc: cvc,
+        },
+      };
+
+      let omise = require("omise")({
+        publicKey: process.env.OMISE_PUBLIC_KEY,
+        secretKey: process.env.OMISE_PRIVATE_KEY,
+      });
+
+      const token = await omise.tokens.create(cardDetails);
+      const customer = await omise.customers.create({
+        email: "john.doe@example.com",
+        description: "John Doe (id: 30)",
+        card: token.id,
+      });
+      const charge = await omise.charges.create({
+        amount: price,
+        currency: "thb",
+        customer: customer.id,
+      });
+      console.log(charge);
+      console.log(charge.amount / 100);
+      const addMoney = charge.amount / 100;
+      // add amount to user's wallet
+      const wallet = await Wallet.findOne({ owner: user });
+      currentMoney = wallet.money;
+      wallet.money = currentMoney + addMoney;
+      await wallet.save();
+      return res.status(200).send("Success");
+    }
   } catch (err) {
     console.log(err);
     return res.status(500).send(err);

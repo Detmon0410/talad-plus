@@ -17,5 +17,6 @@ db.wallet = require("./Wallet.model");
 db.withdraw = require("./Withdraw.model");
 db.image = require("./Image.model");
 db.favorite = require("./Favorite.model");
+db.donate = require("./Donate.model");
 
 module.exports = db;

@@ -105,25 +105,92 @@ exports.userPayment2 = async (req, res) => {
 
 exports.addMoney = async (req, res) => {
   try {
-    const substall = await Substall.findById(req.params.payment);
-    const stall = await Stall.findById(substall.stall);
-    const price = stall.price;
-    const market = await Market.findById(stall.market);
+    const user = req.user;
+    console.log(user);
+    const money = '99'
+    const payment = 'visa';
+    
+    const now = new Date();
+    const timezoneOffsetInMs = now.getTimezoneOffset() * 60 * 1000;
+    const utcPlusSevenTimeInMs = now.getTime() + 7 * 60 * 60 * 1000 + timezoneOffsetInMs;
+    const utcPlusSevenTime = new Date(utcPlusSevenTimeInMs);
+    const hours = utcPlusSevenTime.getHours().toString().padStart(2, '0');
+    const minutes = utcPlusSevenTime.getMinutes().toString().padStart(2, '0');
+    const seconds = utcPlusSevenTime.getSeconds().toString().padStart(2, '0');
+    const date = utcPlusSevenTime.getUTCDate();
+    const month = utcPlusSevenTime.getUTCMonth() + 1;
+    const year = utcPlusSevenTime.getUTCFullYear();
 
-    // Find or create the wallet document for the market owner
-    const wallet = await Wallet.findOneAndUpdate(
-      { owner: market.owner },
-      { $inc: { money: stall.price } },
-      { new: true, upsert: true } // add the upsert option to create a new document if it doesn't exist
-    );
+    const now1 = new Date();
+    now1.setDate(now.getDate() + 30);
+    const timezoneOffsetInMs1 = now.getTimezoneOffset() * 60 * 1000;
+    const utcPlusSevenTimeInMs1 = now.getTime() + 7 * 60 * 60 * 1000 + timezoneOffsetInMs;
+    const utcPlusSevenTime1 = new Date(utcPlusSevenTimeInMs);
+    const hours1 = utcPlusSevenTime.getHours().toString().padStart(2, '0');;
+    const minutes1 = utcPlusSevenTime.getMinutes().toString().padStart(2, '0');;
+    const seconds1 = utcPlusSevenTime.getSeconds().toString().padStart(2, '0');;
+    const date1 = utcPlusSevenTime.getUTCDate();
+    const month1 = utcPlusSevenTime.getUTCMonth() + 1;
+    const year1    = utcPlusSevenTime.getUTCFullYear();
 
-    substall.status = "success";
+    if (payment == "visa") {
+      console.log("VISA!!!");
+      const holdername = "JOHN DOE"//req.body.holdername;
+      const cardnumber = "4242424242424242"//req.body.cardnumber;
+      const exp_year = '24'//req.body.exp_year;
+      const exp_month = '10'//req.body.exp_month;
+      const cvc = '123'//req.body.cvc;
 
-    await substall.save();
-    await wallet.save();
-    return res.status(200).send({ status: "Wallet Incease" });
+      // simple validation
+      if (!holdername || !cardnumber || !exp_month || !exp_year || !cvc) {
+        return res.status(403).send({ message: "Something missing" });
+      }
+      const price = money * 100;
+      let cardDetails = {
+        card: {
+          name: holdername,
+          number: cardnumber,
+          expiration_month: exp_month,
+          expiration_year: "20" + exp_year,
+          cvc: cvc,
+        },
+      };
+
+      let omise = require("omise")({
+        publicKey: process.env.OMISE_PUBLIC_KEY,
+        secretKey: process.env.OMISE_PRIVATE_KEY,
+      });
+
+      const token = await omise.tokens.create(cardDetails);
+      const customer = await omise.customers.create({
+        email: "john.doe@example.com",
+        description: "John Doe (id: 30)",
+        card: token.id,
+      });
+      const charge = await omise.charges.create({
+        amount: price,
+        currency: "thb",
+        customer: customer.id,
+      });
+      console.log(charge);
+      console.log(charge.amount / 100);
+      
+      const market = await Market.findOne({owner: user});
+      console.log(user);
+      market.isDonate = !market.isDonate;
+      await market.save();
+      return res.status(200).send({ status: market.isDonate });
+
+      const addMoney = charge.amount / 100;
+      // add amount to user's wallet
+      const wallet = await Wallet.findOne({ owner: user });
+      currentMoney = wallet.money;
+      wallet.money = currentMoney + addMoney;
+      await wallet.save();
+      return res.status(200).send("Success");
+    }
   } catch (err) {
     console.log(err);
-    return res.status(500).send({ status: "please try again" });
+    return res.status(500).send(err);
   }
 };
