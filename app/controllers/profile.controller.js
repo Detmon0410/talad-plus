@@ -31,9 +31,50 @@ exports.editProfile = async (req, res) => {
 
 exports.getMyProfile = async (req, res) => {
   try {
-    const myUser = await Profile.findOne({ merchant: req.user });
-    console.log(myUser);
-    return res.status(200).send(myUser);
+    const selectedmarket = await Profile.findOne({ merchant: req.user });
+    const star = await Report.find({ market: req.params.uid });
+    const totalStars = star.reduce((acc, cur) => acc + cur.star, 0);
+    const averageStars = totalStars / star.length;
+    const response = {
+      address: selectedmarket.address,
+      district: selectedmarket.district,
+      img: selectedmarket.img,
+      name: selectedmarket.name,
+      post: selectedmarket.post,
+      province: selectedmarket.province,
+      _id: selectedmarket._id,
+      totalStars: averageStars,
+    };
+
+    console.log(response);
+    return res.status(200).send(response);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send(err);
+  }
+};
+
+exports.getSelectProfile = async (req, res) => {
+  try {
+    console.log(req.params.uid);
+    const selectedmarket = await Profile.findOne({
+      merchant: req.params.uid,
+    });
+    const star = await Report.find({ market: req.params.uid });
+    const totalStars = star.reduce((acc, cur) => acc + cur.star, 0);
+    const averageStars = totalStars / star.length;
+    const response = {
+      address: selectedmarket.address,
+      district: selectedmarket.district,
+      img: selectedmarket.img,
+      name: selectedmarket.name,
+      post: selectedmarket.post,
+      province: selectedmarket.province,
+      _id: selectedmarket._id,
+      totalStars: averageStars,
+    };
+    console.log(response);
+    return res.status(200).send(response);
   } catch (err) {
     console.log(err);
     return res.status(500).send(err);
@@ -156,8 +197,9 @@ exports.getSubstall = async (req, res) => {
 
 exports.getReport = async (req, res) => {
   try {
+    console.log(req.params.id);
     const profile = await Profile.findById(req.params.id);
-    const report = await Report.find({ profile: profile });
+    const report = await Report.find({ profile: profile }).populate("reporter");
     return res.status(200).send(report);
   } catch (err) {
     console.log(err);
@@ -220,9 +262,36 @@ exports.deletefavoriteMarket = async (req, res) => {
 exports.getMyFavorite = async (req, res) => {
   try {
     const user = await User.findById(req.user);
+    console.log(req.user);
+    console.log(user);
     const favorite = await Favorite.findOne({ profile: user }).populate(
       "market"
     );
+
+    if (!favorite) {
+      const fav = new Favorite({
+        profile: user,
+      });
+      await fav.save();
+      return res.status(200).send(fav);
+    }
+    return res.status(200).send(favorite);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send(err);
+  }
+};
+
+exports.getViewFavorite = async (req, res) => {
+  try {
+    const profile = await Profile.findById(req.params.id);
+
+    const user = await User.findById(profile.merchant);
+
+    const favorite = await Favorite.findOne({ profile: user._id }).populate(
+      "market"
+    );
+    console.log(favorite);
 
     if (!favorite) {
       const fav = new Favorite({

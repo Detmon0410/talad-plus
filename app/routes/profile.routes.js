@@ -17,7 +17,11 @@ module.exports = function (app) {
   );
   router.get("/:user", [authJwt.verifyToken], profileController.getMyProfile);
   router.patch("/:id/", [authJwt.verifyToken], profileController.editProfile);
-  router.get("/:id/report", [authJwt.verifyToken], profileController.getReport);
+  router.get(
+    "/reported/:id",
+    [authJwt.verifyToken],
+    profileController.getReport
+  );
   router.post(
     "/register",
     [authJwt.verifyToken],
@@ -39,6 +43,11 @@ module.exports = function (app) {
     [authJwt.verifyToken],
     profileController.getSelectedStall
   );
+  router.get(
+    "/view/:uid",
+    [authJwt.verifyToken],
+    profileController.getSelectProfile
+  );
 
   router.post(
     "/favorite",
@@ -56,6 +65,11 @@ module.exports = function (app) {
     "/user/myfavorite",
     [authJwt.verifyToken],
     profileController.getMyFavorite
+  );
+  router.get(
+    "/:id/favlist",
+    [authJwt.verifyToken],
+    profileController.getViewFavorite
   );
   app.use("/apis/profile", router);
 };

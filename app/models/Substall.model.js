@@ -21,6 +21,7 @@ const userSchema = new Schema({
     ref: "Market",
   },
   market_name: String,
+  name: String,
   zone: String,
   transfer_date: String,
   transfer_time: String,

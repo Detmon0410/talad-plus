@@ -150,7 +150,7 @@ exports.rentStall = async (req, res) => {
     const date = utcPlusSevenTime.getUTCDate();
     const month = utcPlusSevenTime.getUTCMonth() + 1;
     const year = utcPlusSevenTime.getUTCFullYear();
-
+    const name = req.user;
     if (hours.length === 1) {
       hours = "0" + hours;
     }
@@ -185,6 +185,7 @@ exports.rentStall = async (req, res) => {
       dateStart: dateStart,
       dateEnd: dateEnd,
       payment: payment,
+      name: name.name,
       transfer_date: `${date}/${month}/${year}`,
       transfer_time: `${hours}:${minutes}`,
       price: selectZone.price,
@@ -402,7 +403,7 @@ exports.deleteImages = async (req, res) => {
     const image = req.params;
     const user = req.user;
     const market = await Market.findOne({ owner: user });
-    const img = await Image.findOne({market: market});
+    const img = await Image.findOne({ market: market });
     img.market.splice(image, 1);
     await img.save();
     return res.status(200).send({ message: "Deleted" });
