@@ -134,7 +134,6 @@ exports.getSubStall = async (req, res) => {
 
 exports.rentStall = async (req, res) => {
   try {
-    console.log(req.body);
     const dateStart = new Date(req.body.date); //เรียกจาก payload
     let dateEnd = new Date(dateStart);
     let { number, payment } = req.body;
@@ -174,25 +173,6 @@ exports.rentStall = async (req, res) => {
     if (!(number >= selectZone.startNum && number <= selectZone.endNum)) {
       return res.status(403).send({ messenage: "stall number out of range" });
     }
-
-    const rentStall = new SubStall({
-      market: market,
-      market_name: market.name,
-      stall: selectZone,
-      zone: selectZone.zone,
-      user: req.user,
-      merchant: req.user.name,
-      number: number,
-      dateStart: dateStart,
-      dateEnd: dateEnd,
-      payment: payment,
-      name: name.name,
-      transfer_date: `${date}/${month}/${year}`,
-      transfer_time: `${hours}:${minutes}`,
-      price: selectZone.price,
-    });
-
-    await rentStall.save();
 
     if (payment == "visa") {
       console.log("VISA!!!");
@@ -241,10 +221,43 @@ exports.rentStall = async (req, res) => {
       currentMoney = wallet.money;
       wallet.money = currentMoney + addMoney;
       await wallet.save();
-      const rentStall = await SubStall.findOne({ owner: market.owner });
-      rentStall.status = "success";
+      const rentStall = new SubStall({
+        market: market,
+        market_name: market.name,
+        stall: selectZone,
+        zone: selectZone.zone,
+        user: req.user,
+        merchant: req.user.name,
+        number: number,
+        dateStart: dateStart,
+        dateEnd: dateEnd,
+        payment: payment,
+        status: 'success',
+        name: name.name,
+        transfer_date: `${date}/${month}/${year}`,
+        transfer_time: `${hours}:${minutes}`,
+        price: selectZone.price,
+      });
       await rentStall.save();
+      return res.status(200).send({ Receipt: rentStall._id });
     }
+    const rentStall = new SubStall({
+      market: market,
+      market_name: market.name,
+      stall: selectZone,
+      zone: selectZone.zone,
+      user: req.user,
+      merchant: req.user.name,
+      number: number,
+      dateStart: dateStart,
+      dateEnd: dateEnd,
+      payment: payment,
+      name: name.name,
+      transfer_date: `${date}/${month}/${year}`,
+      transfer_time: `${hours}:${minutes}`,
+      price: selectZone.price,
+    });
+    await rentStall.save();
     return res.status(200).send({ Receipt: rentStall._id });
   } catch (err) {
     console.log(err);
