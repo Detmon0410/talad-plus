@@ -199,8 +199,14 @@ exports.getReport = async (req, res) => {
   try {
     console.log(req.params.id);
     const profile = await Profile.findById(req.params.id);
-    const report = await Report.find({ profile: profile }).populate("reporter");
-    return res.status(200).send(report);
+    let reports = await Report.find({ profile: profile })
+      .populate("reporter")
+      .lean();
+    for (const report of reports) {
+      const market = await Market.findOne({ owner: report.reporter });
+      report["market"] = market.name;
+    }
+    return res.status(200).send(reports);
   } catch (err) {
     console.log(err);
     return res.status(500).send(err);

@@ -138,7 +138,7 @@ exports.rentStall = async (req, res) => {
     const dayOfWeek = dateStart.getDay();
     const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     const dayName = dayNames[dayOfWeek];
-  
+
     let dateEnd = new Date(dateStart);
     let { number, payment } = req.body;
     const market = await Market.findById(req.params.marketId);
@@ -148,9 +148,9 @@ exports.rentStall = async (req, res) => {
     const utcPlusSevenTimeInMs =
       now.getTime() + 7 * 60 * 60 * 1000 + timezoneOffsetInMs;
     const utcPlusSevenTime = new Date(utcPlusSevenTimeInMs);
-    const hours = utcPlusSevenTime.getHours().toString().padStart(2, '0');
-    const minutes = utcPlusSevenTime.getMinutes().toString().padStart(2, '0');
-    const seconds = utcPlusSevenTime.getSeconds().toString().padStart(2, '0');
+    const hours = utcPlusSevenTime.getHours().toString().padStart(2, "0");
+    const minutes = utcPlusSevenTime.getMinutes().toString().padStart(2, "0");
+    const seconds = utcPlusSevenTime.getSeconds().toString().padStart(2, "0");
     const date = utcPlusSevenTime.getUTCDate();
     const month = utcPlusSevenTime.getUTCMonth() + 1;
     const year = utcPlusSevenTime.getUTCFullYear();
@@ -176,8 +176,8 @@ exports.rentStall = async (req, res) => {
     }
 
     const dayOpen = selectZone.dayOpen;
-    const day = dayOpen[0];;
-    const split = day.split(',');
+    const day = dayOpen[0];
+    const split = day.split(",");
     const open = split.includes(dayName);
 
     if (!open) {
@@ -242,7 +242,7 @@ exports.rentStall = async (req, res) => {
         dateStart: dateStart,
         dateEnd: dateEnd,
         payment: payment,
-        status: 'success',
+        status: "success",
         name: name.name,
         transfer_date: `${date}/${month}/${year}`,
         transfer_time: `${hours}:${minutes}`,
@@ -425,9 +425,12 @@ exports.getImages = async (req, res) => {
 exports.deleteImages = async (req, res) => {
   try {
     const user = req.user;
+    const imgb64 = req.body.img;
     const market = await Market.findOne({ owner: user });
     const img = await Image.findOne({ market: market });
-    img.image = [];
+    const imgArray = img.image;
+    const index = imgArray.findIndex((str) => str.includes(imgb64));
+    imgArray.splice(index, 1);
     await img.save();
     return res.status(200).send({ message: "Deleted" });
   } catch (err) {
