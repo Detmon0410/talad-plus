@@ -135,6 +135,10 @@ exports.getSubStall = async (req, res) => {
 exports.rentStall = async (req, res) => {
   try {
     const dateStart = new Date(req.body.date); //เรียกจาก payload
+    const dayOfWeek = dateStart.getDay();
+    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const dayName = dayNames[dayOfWeek];
+  
     let dateEnd = new Date(dateStart);
     let { number, payment } = req.body;
     const market = await Market.findById(req.params.marketId);
@@ -144,20 +148,14 @@ exports.rentStall = async (req, res) => {
     const utcPlusSevenTimeInMs =
       now.getTime() + 7 * 60 * 60 * 1000 + timezoneOffsetInMs;
     const utcPlusSevenTime = new Date(utcPlusSevenTimeInMs);
-    const hours = utcPlusSevenTime.getHours();
-    const minutes = utcPlusSevenTime.getMinutes();
-    const seconds = utcPlusSevenTime.getSeconds();
+    const hours = utcPlusSevenTime.getHours().toString().padStart(2, '0');
+    const minutes = utcPlusSevenTime.getMinutes().toString().padStart(2, '0');
+    const seconds = utcPlusSevenTime.getSeconds().toString().padStart(2, '0');
     const date = utcPlusSevenTime.getUTCDate();
     const month = utcPlusSevenTime.getUTCMonth() + 1;
     const year = utcPlusSevenTime.getUTCFullYear();
+    //////////////////////////////////////////////////////////////////
     const name = req.user;
-    if (hours.length === 1) {
-      hours = "0" + hours;
-    }
-    if (minutes.length === 1) {
-      minutes = "0" + minutes;
-    }
-
     if (selectZone.paytype === "Month") {
       dateEnd.setDate(dateEnd.getDate() + 30);
     } else {
@@ -172,6 +170,18 @@ exports.rentStall = async (req, res) => {
     }
     if (!(number >= selectZone.startNum && number <= selectZone.endNum)) {
       return res.status(403).send({ messenage: "stall number out of range" });
+    }
+    if (!(number >= selectZone.startNum && number <= selectZone.endNum)) {
+      return res.status(403).send({ messenage: "stall number out of range" });
+    }
+
+    const dayOpen = selectZone.dayOpen;
+    const day = dayOpen[0];;
+    const split = day.split(',');
+    const open = split.includes(dayName);
+
+    if (!open) {
+      return res.status(403).send({ messenage: "ไม่สามารถจองได้ในวันนี้" });
     }
 
     if (payment == "visa") {
