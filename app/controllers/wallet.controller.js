@@ -13,17 +13,18 @@ const Withdraw = db.withdraw;
 
 exports.createWallet = async (req, res) => {
   try {
-    const { bank_username, bank_number, bank_name } = req.body;
+    const { bank_user, bank_number, bank_name } = req.body;
     const user = await User.findById(req.user._id);
-
+    console.log(bank_user);
     const wallet = new Wallet({
-      name: bank_username,
+      name: bank_user,
       bank_number: bank_number,
       bank_name: bank_name,
       owner: user,
     });
 
     await wallet.save();
+    console.log(wallet);
     return res.status(200).send(wallet);
   } catch (err) {
     return res.status(500).send(err);

@@ -401,13 +401,11 @@ exports.getImages = async (req, res) => {
 
 exports.deleteImages = async (req, res) => {
   try {
-    const image = req.files.img;
-    console.log(image);
-    // const user = req.user;
-    // const market = await Market.findOne({ owner: user });
-    // const img = await Image.findOne({ market: market });
-    // img.market.splice(image, 1);
-    // await img.save();
+    const user = req.user;
+    const market = await Market.findOne({ owner: user });
+    const img = await Image.findOne({ market: market });
+    img.image = [];
+    await img.save();
     return res.status(200).send({ message: "Deleted" });
   } catch (err) {
     console.log(err);

@@ -15,7 +15,7 @@ const Donate = db.donate;
 //api register
 exports.register = async (req, res) => {
   try {
-    const { name, phone, address, district, province, post, subdistrict } =
+    const { name, ownername, phone, address, district, province, post, subdistrict } =
       req.body;
     let image_b64 = "";
     let image_b64_license = "";
@@ -49,8 +49,9 @@ exports.register = async (req, res) => {
     }
     const market = new Market(req.body);
 
-    market.detail = "";
+    market.detail = '';
     market.owner = req.user;
+    
     market.imglicense = image_b64_license;
     market.img = image_b64;
     await market.save();
@@ -273,7 +274,7 @@ exports.editDetail = async (req, res) => {
     return res.status(200).send({ status: "Market edited", market });
   } catch (err) {
     console.log(err);
-    return res.status(500).send({ error: "An error occurred" });
+    return res.status(500).send({ status: "please try again" });
   }
 };
 
@@ -287,25 +288,20 @@ exports.buyAdvertisement = async (req, res) => {
     const utcPlusSevenTimeInMs =
       now.getTime() + 7 * 60 * 60 * 1000 + timezoneOffsetInMs;
     const utcPlusSevenTime = new Date(utcPlusSevenTimeInMs);
-    const hours = utcPlusSevenTime.getHours().toString().padStart(2, "0");
-    const minutes = utcPlusSevenTime.getMinutes().toString().padStart(2, "0");
-    const seconds = utcPlusSevenTime.getSeconds().toString().padStart(2, "0");
+    const hours = utcPlusSevenTime.getHours().toString().padStart(2, '0');
+    const minutes = utcPlusSevenTime.getMinutes().toString().padStart(2, '0');
+    const seconds = utcPlusSevenTime.getSeconds().toString().padStart(2, '0');
     const date = utcPlusSevenTime.getUTCDate();
     const month = utcPlusSevenTime.getUTCMonth() + 1;
     const year = utcPlusSevenTime.getUTCFullYear();
 
-    const now1 = new Date();
-    now1.setDate(now.getDate() + 30);
-    const timezoneOffsetInMs1 = now.getTimezoneOffset() * 60 * 1000;
-    const utcPlusSevenTimeInMs1 =
-      now.getTime() + 7 * 60 * 60 * 1000 + timezoneOffsetInMs;
-    const utcPlusSevenTime1 = new Date(utcPlusSevenTimeInMs);
-    const hours1 = utcPlusSevenTime.getHours().toString().padStart(2, "0");
-    const minutes1 = utcPlusSevenTime.getMinutes().toString().padStart(2, "0");
-    const seconds1 = utcPlusSevenTime.getSeconds().toString().padStart(2, "0");
-    const date1 = utcPlusSevenTime.getUTCDate();
-    const month1 = utcPlusSevenTime.getUTCMonth() + 1;
-    const year1 = utcPlusSevenTime.getUTCFullYear();
+    const next30Days = new Date(utcPlusSevenTime.getTime() + 30 * 24 * 60 * 60 * 1000);
+    const hours1 = next30Days.getHours().toString().padStart(2, '0');
+    const minutes1 = next30Days.getMinutes().toString().padStart(2, '0');
+    const seconds1 = next30Days.getSeconds().toString().padStart(2, '0');
+    const date1 = next30Days.getUTCDate();
+    const month1 = next30Days.getUTCMonth() + 1;
+    const year1 = next30Days.getUTCFullYear();
 
     if (payment == "visa") {
       console.log("VISA!!!");
@@ -382,18 +378,13 @@ exports.buyAdvertisement = async (req, res) => {
 };
 
 exports.donateStatus = async (req, res) => {
-  try {
-    const market = req.paraams.market;
+    try { 
+    const market = await Market.findById(req.params.market);
     market.isDonate = !market.isDonate;
     await market.save();
-    const donate = await Donate.findOneAndUpdate(
-      { market: market },
-      { status: "Deactivated" },
-      {
-        new: true,
-      }
-    );
-    await donate.save();
+    const donate   = await Donate.findOneAndDelete({market: market});
+
+
     return res.status(200).send({ status: "Deactivated" });
   } catch (err) {
     console.log(err);

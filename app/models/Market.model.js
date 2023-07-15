@@ -7,6 +7,8 @@ const userSchema = new Schema({
     ref: "User",
   },
   name: String,
+  phone: String,
+  ownername:String,
   closedDate: [String],
   zone: [
     {
