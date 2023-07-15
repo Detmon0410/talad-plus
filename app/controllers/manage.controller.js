@@ -169,10 +169,10 @@ exports.rentStall = async (req, res) => {
       return res.status(403).send({ message: "Market owner can't rent stall" });
     }
     if (!(number >= selectZone.startNum && number <= selectZone.endNum)) {
-      return res.status(403).send({ messenage: "stall number out of range" });
+      return res.status(403).send({ message: "stall number out of range" });
     }
     if (!(number >= selectZone.startNum && number <= selectZone.endNum)) {
-      return res.status(403).send({ messenage: "stall number out of range" });
+      return res.status(403).send({ message: "stall number out of range" });
     }
 
     const dayOpen = selectZone.dayOpen;
@@ -181,7 +181,9 @@ exports.rentStall = async (req, res) => {
     const open = split.includes(dayName);
 
     if (!open) {
-      return res.status(403).send({ messenage: "ไม่สามารถจองได้ในวันนี้" });
+      return res
+        .status(403)
+        .send({ message: "ไม่สามารถจองได้เนื่องจากตลาดปิด" });
     }
 
     if (payment == "visa") {
