@@ -65,7 +65,6 @@ exports.createProfile = async (req, res) => {
       subdistrict: subdistrict,
     });
     await profile.save();
-
     return res.status(201).send({ message: "Register successfully" });
   } catch (err) {
     console.log(err);
@@ -134,7 +133,6 @@ exports.merchantregister = async (req, res) => {
     merchant.img = image_b64;
 
     await merchant.save();
-
     console.log(merchant);
     res.status(201).send({ message: "Register successfully" });
   } catch (err) {
@@ -181,11 +179,12 @@ exports.favoriteMarket = async (req, res) => {
   try {
     const user = await User.findById(req.user);
     const market = await Market.findById(req.body.marketId);
-    const favorite = await Favorite.findOne({ profile: user });
+    const profile = await Profile.findOne({ merchant: user });
+    const favorite = await Favorite.findOne({ profile: profile });
     console.log(req.body);
     if (!favorite) {
       const fav = new Favorite({
-        profile: user,
+        profile: profile,
       });
       fav.market.push(market);
       await fav.save();
@@ -205,8 +204,8 @@ exports.deletefavoriteMarket = async (req, res) => {
   try {
     const user = await User.findById(req.user);
     const market = await Market.findById(req.body.market);
-
-    const favorite = await Favorite.findOne({ profile: user });
+    const profile = await Profile.findOne({ merchant: user });
+    const favorite = await Favorite.findOne({ profile: profile });
 
     favorite.market.splice(market, 1);
     await favorite.save();
@@ -220,17 +219,10 @@ exports.deletefavoriteMarket = async (req, res) => {
 exports.getMyFavorite = async (req, res) => {
   try {
     const user = await User.findById(req.user);
-    const favorite = await Favorite.findOne({ profile: user }).populate(
+    const profile = await Profile.findOne({ merchant: user });
+    const favorite = await Favorite.findOne({ profile: profile }).populate(
       "market"
     );
-
-    if (!favorite) {
-      const fav = new Favorite({
-        profile: user,
-      });
-      await fav.save();
-      return res.status(200).send(fav);
-    }
     return res.status(200).send(favorite);
   } catch (err) {
     console.log(err);
