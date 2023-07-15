@@ -225,6 +225,7 @@ exports.favoriteMarket = async (req, res) => {
     const market = await Market.findById(req.body.marketId);
     const favorite = await Favorite.findOne({ profile: user });
     console.log(req.body);
+
     if (!favorite) {
       const fav = new Favorite({
         profile: user,
@@ -234,9 +235,17 @@ exports.favoriteMarket = async (req, res) => {
       return res.status(200).send({ message: "Saved" });
     }
 
-    favorite.market.push(market);
-    await favorite.save();
-    return res.status(200).send({ message: "Saved" });
+    // Check if the market already exists in the favorite.market array
+    const isMarketExists = favorite.market.some((favMarket) =>
+      favMarket.equals(market._id)
+    );
+    console.log(isMarketExists);
+    if (!isMarketExists) {
+      favorite.market.push(market);
+      await favorite.save();
+    }
+
+    return res.status(200).send({ message: "Saved2" });
   } catch (err) {
     console.log(err);
     return res.status(500).send({ error: "An error occurred" });

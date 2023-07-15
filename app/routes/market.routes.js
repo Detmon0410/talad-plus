@@ -27,12 +27,15 @@ module.exports = function (app) {
   );
 
   router.get("/search", authJwt.verifyToken, marketController.SearchByDistrict);
-  router.get("/search/name", authJwt.verifyToken, marketController.SearchByName);
-  router.patch("/:detail", marketController.editDetail);
+  router.get(
+    "/search/name",
+    authJwt.verifyToken,
+    marketController.SearchByName
+  );
+  router.post("/editdetail", marketController.editDetail);
 
   router.post("/:market/advertisement", marketController.buyAdvertisement);
   router.post("/:market/undonate", marketController.donateStatus);
 
   app.use("/apis/market", router);
 };
-  
