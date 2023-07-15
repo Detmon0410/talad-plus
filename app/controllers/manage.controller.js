@@ -432,7 +432,7 @@ exports.deleteImages = async (req, res) => {
     const index = imgArray.findIndex((str) => str.includes(imgb64));
     imgArray.splice(index, 1);
     await img.save();
-    return res.status(200).send({ message: "Deleted" });
+    return res.status(200).send({ message: "image deleted" });
   } catch (err) {
     console.log(err);
     return res.status(500).send({ error: "An error occurred" });
